@@ -1,0 +1,43 @@
+\name{bootstrap.grow.prune}
+\alias{bootstrap.grow.prune}
+\title{Bootstrap Approach to Grow and Prune Multivariate Survival Trees}
+\description{Grows and prunes multivariate survival trees using a bootstrap approach}
+\usage{
+bootstrap.grow.prune(data, method=c("marginal", "gamma.frailty", "exp.frailty"),
+min.ndsz=20, n0=3, col.time, col.status, col.id,col.split.var, col.ctg=NULL,
+max.depth=10, mtry=length(col.split.var), B=30, LeBlanc=TRUE, min.boot.tree.size=1,
+details=FALSE, cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50)
+}
+\arguments{
+  \item{B}{Number of bootstrap samples}
+  \item{data}{Dataset}
+  \item{method}{Indicates method of estimating correlation: must be either "marginal", "gamma.frailty", or "exp.frailty"}
+  \item{min.ndsz}{Number: Controls the minimum node size}
+  \item{n0}{Number: Controls the minimum number of uncensored event times at either child node}
+  \item{col.time}{Column number for time}
+  \item{col.status}{Column number for status}
+  \item{col.id}{Column number for id}
+  \item{col.split.var}{Column numbers of all variables wanting to split}
+  \item{col.ctg}{Column numbers of categorical variables wanting to split; should be a subset of col.split.var}
+  \item{max.depth}{Number: Maximum depth of tree}
+  \item{mtry}{Number of variables considered at each split}
+  \item{LeBlanc}{Logical: Indicates if entire sample used (alternative is out-of-bag sample)}
+  \item{min.boot.tree.size}{Number: Minimum size of tree grown at each bootstrap}
+  \item{details}{Logical: Indicates if detailed information should be printed}
+  \item{cont.split}{Indicates candidate splits: must be "distinct" or "percentiles"}
+  \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when cont.split="percentiles"}
+  \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when cont.split="percentiles"}
+}
+\value{
+  \item{initial.tree}{The initial tree}
+  \item{boot.prune}{Information on trees pruned for each bootstrap sample}
+  \item{boot.tree}{Pruned trees for each bootstrap sample}
+}
+\author{Xiaogang Su, Peter Calhoun, Juanjuan Fan}
+\note{This function is computationally intensive and may take some time}
+\seealso{\code{\link{MST}}}
+\keyword{Trees}
+\keyword{Survival}
+\keyword{Multivariate}
+\keyword{Correlated}
+\keyword{Bootstrap}
