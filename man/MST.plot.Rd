@@ -2,11 +2,16 @@
 \alias{MST.plot}
 \title{Plot Multivariate Survival Trees}
 \description{Plot trees from the \code{MST} output}
-\usage{MST.plot(tree, textDepth = 3, lines = "rectangle")}
+\usage{MST.plot(tree, textDepth = 4, digits = 3, nsmall = 0L, varText = c("vname", "var"),
+lines = c("rectangle", "triangle"), ...)}
 \arguments{
   \item{tree}{Tree to be plotted}
   \item{textDepth}{Depth of text}
-  \item{lines}{Shape of lines connecting nodes: must be either "rectangle" or "triangle"}
+  \item{digits}{Number of significant digits to be displayed}
+  \item{nsmall}{The minimum number of digits to the right of the decimal point}
+  \item{varText}{Indicates whether variable name or number should be displayed: must be either \code{"vname"} or \code{"var"}}
+  \item{lines}{Shape of lines connecting nodes: must be either \code{"rectangle"} or \code{"triangle"}}
+  \item{\dots}{Arguments to be passed to methods, such as graphical parameters}
 }
 \value{Plot of tree structure}
 \author{Peter Calhoun, Xiaogang Su, Juanjuan Fan}
@@ -21,15 +26,12 @@ training <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
 
 #Test dataset:
 test <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-	digits=1, icensor=1, model = "marginal.multivariate.exponential", 
-	rho=.65, N=100, K=4)$dat
+  digits=1, icensor=1, model = "marginal.multivariate.exponential", 
+  rho=.65, N=100, K=4)$dat
 
 #Construct Multivariate Survival Tree:
-fit <- MST(training=training,	test=test, method="marginal",	min.ndsz=30, n0=5,
-	col.time=3, col.status=4, col.id=1, col.split.var=5:8, col.ctg=col.ctg,
-	max.depth=6, mtry=length(col.split.var), selection.method = "test.sample",
-	plot.it=TRUE, filename=NULL, horizontal=TRUE, details=FALSE, cont.split="distinct")
-
+fit <- MST(training=training,  test=test, method="marginal",	min.ndsz=30, min.nevents=5,
+  col.time=3, col.status=4, col.id=1, col.split.var=5:8, selection.method = "test.sample")
 
 MST.plot(fit$tree0, textDepth=5)          #Plot of initial tree
 MST.plot(fit$best.tree.structure[[4]])    #Plot of best-sized tree

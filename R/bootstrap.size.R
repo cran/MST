@@ -1,5 +1,5 @@
 bootstrap.size <-
-function(bootstrap.grow.prune.results, plot.it=TRUE, filename=NULL, horizontal=TRUE){
+function(bootstrap.grow.prune.results, plot.Ga=TRUE, filename=NULL, horizontal=TRUE){
   # EXTRACT NEEDED COMPONENTS
   boot.prune <- bootstrap.grow.prune.results$boot.prune
   tree0 <- bootstrap.grow.prune.results$initial.tree
@@ -48,7 +48,7 @@ function(bootstrap.grow.prune.results, plot.it=TRUE, filename=NULL, horizontal=T
   n.subtrees <- nrow(G.a)
   subtree.size <- G.a[,1]   
   # PLOT THE G.a WITH DIFFERENT CHOICES OF a 	
-  if (plot.it) {
+  if (plot.Ga) {
     if (!is.null(filename)) postscript(file=filename, horizontal=horizontal)
     par(mfrow=c(1, 1), mar=rep(4, 4))   ##################### SET THE PLOTTING PARAMETERS
     

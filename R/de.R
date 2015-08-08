@@ -1,4 +1,5 @@
-de <- function(x, tree){
+de <-
+function(x, tree){
   if(length(x) != 1) stop("The length of x in function de must be 1.")
   y <- tree$node;  de <- NA
   if(sum(match(x, y), na.rm = TRUE) != 0) {

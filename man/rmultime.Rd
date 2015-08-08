@@ -13,13 +13,12 @@ lambda = 0.1, N = 100, K = 4)
   \item{cutoff}{Cutoff values for each covariate}
   \item{digits}{Rounding digits}
   \item{icensor}{Control for censoring rate: 1 - 50\%}
-  \item{model}{Model for simulating data: must be either "gamma.frailty", "log.normal.frailty", "marginal.multivariate.exponential", "marginal.nonabsolutely.continuous", 
-  
-  or "nonPH.weibull"}
-  \item{v}{Scale parameter for "gamma.frailty" and "nonPH.weibull" or variance parameter for "log.normal.frailty" models.  Not used in marginal models}
+  \item{model}{Model for simulating data: must be either \code{"gamma.frailty"}, \code{"log.normal.frailty"}, \code{"marginal.multivariate.exponential"}, \code{"marginal.nonabsolutely.continuous"},
+  or \code{"nonPH.weibull"}}
+  \item{v}{Scale parameter for \code{"gamma.frailty"} and \code{"nonPH.weibull"} or variance parameter for \code{"log.normal.frailty"} models.  Not used in marginal models}
   \item{rho}{Correlation for marginal models.  Not used in other models}
-  \item{a}{Parameter for "nonPH.weibull" model.  Not used in other models}
-  \item{lambda}{Parameter for "nonPH.weibull" model.  Not used in other models}
+  \item{a}{Parameter for \code{"nonPH.weibull"} model.  Not used in other models}
+  \item{lambda}{Parameter for \code{"nonPH.weibull"} model.  Not used in other models}
   \item{N}{Number of clusters (ids)}
   \item{K}{Number of units per cluster}
 }

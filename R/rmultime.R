@@ -1,4 +1,5 @@
-rmultime <- function(beta=c(-1, 2, 1, 0, 0),      						# beta vector values with a beta0 (dim=p+1) 
+rmultime <-
+function(beta=c(-1, 2, 1, 0, 0),      						# beta vector values with a beta0 (dim=p+1) 
                      cutoff=c(.5, .5, 0, 0),								# cutoff values for each x (dim <= p)
                      digits=1,										# rounding digits, suggested to be 1 or 2
                      icensor=1, 										# control for censoring rate: 1 - 50%;

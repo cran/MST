@@ -6,7 +6,6 @@
 \alias{is.odd}
 \alias{loglik0}
 \alias{obtain.btree}
-\alias{ordinalize}
 \alias{partition.MST}
 \alias{power.set}
 \alias{prune.size}
@@ -22,14 +21,14 @@ This package constructs trees for multivariate survival data using marginal and 
 \tabular{ll}{
 Package: \tab MST\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2014-09-19\cr
+Version: \tab 1.1\cr
+Date: \tab 2015-08-08\cr
 License: \tab GPL-2 \cr
 }
-Regression trees require few statistical assumptions, handle a variety of data structures, and provide meaningful interpretations.  There are several functions to construct regression trees (see \pkg{rpart}, \pkg{tree}, and \pkg{party}); this package extends the implementation to multivariate survival data. There are two main approaches to analyzing correlated failure times.  One is the marginal approach studied by authors Wei et al. (1989) and Liang et al. (1993).  In the marginal model, the correlation is modeled implicitly using estimating equations on the marginal distribution formulated by the Cox (1972) proportional hazards model.  The other approach is the frailty model studied by Clayton (1978) and Clayton and Cuzick (1985).  In the frailty model, the correlation is modeled explicitly by a multiplicative random effect called frailty, which corresponds to some common unobserved characteristics shared by all correlated times.
+Regression trees require few statistical assumptions, handle a variety of data structures, and provide meaningful interpretations.  There are several functions to construct regression trees (see \pkg{rpart}, \pkg{tree}, and \pkg{party}); this package extends the implementation to multivariate survival data. There are two main approaches to analyzing correlated failure times.  One is the marginal approach studied by authors Wei et al. (1989) and Liang et al. (1993).  In the marginal model, the correlation is modeled implicitly using generalized estimating equations on the marginal distribution formulated by the Cox (1972) proportional hazards model.  The other approach is the frailty model studied by Clayton (1978) and Clayton and Cuzick (1985).  In the frailty model, the correlation is modeled explicitly by a multiplicative random effect called frailty, which corresponds to some common unobserved characteristics shared by all correlated times.
 
 
-Construction of the tree consists of three stages: growing the initial tree, pruning the tree, and selecting the best-sized subtree; details of these steps are described elsewhere (Fan et al. [2006], Su and Fan [2004], and Fan et al. [2009]).  There are two methods for selecting the best-sized subtree.  When the dataset is large, one may divide the dataset into a training sample to grow and prune the initial tree and a test sample to select the best-sized tree.  When the dataset is small, one can resample the dataset to choose the best-sized subtree. 
+The construction of the tree adopts a modified CART procedure controlling for the correlated failure times.  The procedure consists of three stages: growing the initial tree, pruning the tree, and selecting the best-sized subtree; details of these steps are described elsewhere (Fan et al. [2006], Su and Fan [2004], and Fan et al. [2009]).  There are two methods for selecting the best-sized subtree.  When the dataset is large, one may divide the dataset into a training sample to grow and prune the initial tree and a test sample to select the best-sized tree.  When the dataset is small, one can resample the dataset to choose the best-sized subtree. 
 }
 \author{
 Xiaogang Su, Peter Calhoun, & Juanjuan Fan

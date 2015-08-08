@@ -1,9 +1,10 @@
-grow.MST <- function(
-  dat,       						# the training data	
+grow.MST <-
+function(
+  dat,     							# the training data	
   test=NULL, 								# the test data; If it is NULL, the splitting info is replaced with the training data.
   method=c("marginal", "gamma.frailty", "exp.frailty"),			# Choose among the three MST methods, with choices "marginal", "gamma.frailty", and "exp.frailty" 
   min.ndsz=20, 							# min.ndsz controls the minimum node size 
-  n0=3, 								# n0=5 controls the minimum number of uncensored event times at either child node
+  min.nevents=3, 								# min.nevents controls the minimum number of uncensored event times at either child node
   col.time, col.status, col.id,					# columns for time, status, and id, respectively
   col.split.var, 							# columns of splitting variables
   col.ctg=NULL, 							# columns of categorical variables; this should be a subset of col.split.var
@@ -29,15 +30,15 @@ grow.MST <- function(
         test0 <- NULL
         if (!is.null(test)) test0 <- list.test[[i]]
         if (method=="marginal") split <- partition.MST(dat=list.nd[[i]], test=test0, name=name[i],
-                                                       method="marginal", min.ndsz=min.ndsz, n0=n0, 
+                                                       method="marginal", min.ndsz=min.ndsz, min.nevents=min.nevents, 
                                                        col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=NULL, 
                                                        max.depth=max.depth, details=details,cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
         else if (method=="gamma.frailty") split <- partition.MST(dat=list.nd[[i]], test=test0, name=name[i],
-                                                                 method="gamma.frailty", min.ndsz=min.ndsz, n0=n0, 
+                                                                 method="gamma.frailty", min.ndsz=min.ndsz, min.nevents=min.nevents, 
                                                                  col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=NULL, 
                                                                  max.depth=max.depth, details=details, cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
         else if (method=="exp.frailty") split <- partition.MST(dat=list.nd[[i]], test=test0, name=name[i],
-                                                               method="exp.frailty", min.ndsz=min.ndsz, n0=n0, 
+                                                               method="exp.frailty", min.ndsz=min.ndsz, min.nevents=min.nevents, 
                                                                col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=NULL, 
                                                                max.depth=max.depth, details=details, cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
         # print(split$info)

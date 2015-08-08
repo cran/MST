@@ -1,5 +1,10 @@
 MST.plot <-
-function(tree, textDepth=3, lines="rectangle"){
+function(tree, textDepth=4, digits=3, nsmall=0L, varText=c("vname","var"), lines=c("rectangle", "triangle"),...){
+  if(all(varText==c("vname", "var"))){varText="vname"
+  } else if (!(varText %in% c("vname", "var"))){stop("Wrong specification of varText= argument")}
+  if(all(lines==c("rectangle", "triangle"))){lines="rectangle"
+  } else if (!(lines %in% c("rectangle", "triangle"))){stop("Wrong specification of lines= argument")}
+  
   depth<-max(nchar(tree[,1]))
   par(xaxs='i')
   par(mar=c(1,1,1,1))
@@ -10,42 +15,54 @@ function(tree, textDepth=3, lines="rectangle"){
   nodesBin<-gsub("2", "1", nodesBin)
   lastObs<-nchar(nodesBin)
   nodesBin<-substr(nodesBin,2,lastObs)
-  var <- tree$vname
+  var <- tree$var
+  vname <- tree$vname
   cut <- as.character(tree$cut)
   size <- tree$size
-  
+  operator <- tree$operator
   for(i in 1:length(nodesBin)){
     nChar<-nchar(nodesBin[i])
-    if(!is.na(var[i])){
+    if(!is.na(vname[i])){
       if(lines=="rectangle"){
         lines(c((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+1),
                 (1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+3)),
-              c((depth-nChar)/(depth+1),(depth-nChar)/(depth+1)))
+              c((depth-nChar)/(depth+1),(depth-nChar)/(depth+1)),...)
         
         lines(c((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+1),
                 (1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+1)),
-              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)))
+              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)),...)
         
         lines(c((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+3),
                 (1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+3)),
-              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)))
+              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)),...)
         
       } else if(lines=="triangle"){
         lines(c((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),
                 (1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+1)),
-              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)))
+              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)),...)
         
         lines(c((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),
                 (1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+3)),
-              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)))
+              c((depth-nChar)/(depth+1),(depth-nChar-1)/(depth+1)),...)
       }         
       
-      if(nChar <= textDepth){
-        text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(.(as.character(var[i]))<=.(cut[i])),cex=1)
+      if(nChar < textDepth){
+        if(suppressWarnings(!is.na(as.numeric(cut[i])))){cut[i]<-format(round(as.numeric(as.character(tree$cut[i])), digits), nsmall = nsmall)}
+        if(varText=="vname"){
+          if(operator[i]=="<="){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(.(as.character(vname[i])) <= .(cut[i])),...)
+          } else if(operator[i]==">"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(.(as.character(vname[i])) > .(cut[i])),...)
+          } else if(operator[i]=="in"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(.(as.character(vname[i])) %in% group("{",.(cut[i]),"}")),...)
+          } else if(operator[i]=="not in"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(.(as.character(vname[i])) %notin% group("{",.(cut[i]),"}")),...)}
+        } else {
+          if(operator[i]=="<="){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(V[.(var[i])] <= .(cut[i])),...)
+          } else if(operator[i]==">"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(V[.(var[i])] > .(cut[i])),...)
+          } else if(operator[i]=="in"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(V[.(var[i])] %in% group("{",.(cut[i]),"}")),...)
+          } else if(operator[i]=="not in"){text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1)+1/(depth+20),bquote(V[.(var[i])] %notin% group("{",.(cut[i]),"}")),...)}
+        }
       }
     } else {
-      if(nChar <= textDepth){
-        text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1),paste("N=",size[i],sep=""),cex=1,offset=1)
+      if(nChar < textDepth){
+        text((1/(2^(nChar+2)))*(4*strtoi(nodesBin[i], base = 2)+2),(depth-nChar)/(depth+1),paste("N=",size[i],sep=""),offset=1,...)
       }
     }
   }

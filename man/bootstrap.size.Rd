@@ -3,12 +3,12 @@
 \title{Bootstrap Approach to Select Best-Sized Multivariate Survival Tree}
 \description{Selects the best-sized multivariate survival tree using a bootstrap approach}
 \usage{
-bootstrap.size(bootstrap.grow.prune.results, plot.it = TRUE, filename = NULL,
+bootstrap.size(bootstrap.grow.prune.results, plot.Ga = TRUE, filename = NULL,
 horizontal = TRUE)
 }
 \arguments{
   \item{bootstrap.grow.prune.results}{Results from \code{bootstrap.grow.prune}}
-  \item{plot.it}{Logical: Indicates if you want to plot the goodness-of-fit vs. tree size}
+  \item{plot.Ga}{Logical: Indicates if goodness-of-fit vs. tree size should be plotted}
   \item{filename}{Name of the file plotted}
   \item{horizontal}{Logical: Indicates if plot should be landscape}
 }

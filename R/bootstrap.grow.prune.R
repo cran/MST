@@ -1,7 +1,8 @@
-bootstrap.grow.prune <- function(data,   								# data frame containing the training set
+bootstrap.grow.prune <-
+function(data, 									# data frame containing the training set
                                  method=c("marginal", "gamma.frailty", "exp.frailty"),	# Choose among the three MST methods, with choices "marginal", "gamma.frailty", and "exp.frailty" 
                                  min.ndsz=20, 								# min.ndsz controls the minimum node size 
-                                 n0=3, 									# n0=5 controls the minimum number of uncensored event times at either child node
+                                 min.nevents=3, 									# min.nevents controls the minimum number of uncensored event times at either child node
                                  col.time, col.status, col.id,					# columns for time, status, and id, respectively
                                  col.split.var, 							# columns of splitting variables
                                  col.ctg=NULL, 								# columns of categorical variables; this should be a subset of col.split.var
@@ -23,7 +24,7 @@ bootstrap.grow.prune <- function(data,   								# data frame containing the tra
   call <- match.call(); out <- match.call(expand.dots = FALSE)
   out$boot.tree <- out$boot.prune <- out$... <- NULL
   time.start <- date()
-  tree0 <- grow.MST(dat=data, test=NULL, method=method, min.ndsz=min.ndsz, n0=n0, 
+  tree0 <- grow.MST(dat=data, test=NULL, method=method, min.ndsz=min.ndsz, min.nevents=min.nevents, 
                     col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=col.ctg,
                     max.depth=max.depth, mtry=mtry, details=details, cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
   if (NROW(tree0)==1) {print(tree0); stop("Your initial tree is a NULL tree! There is no need for tree size selection.")}
@@ -37,10 +38,10 @@ bootstrap.grow.prune <- function(data,   								# data frame containing the tra
     dat <- data[samp, ]
     dat.oob <- data[-unique(samp),]
     n.oob <- nrow(dat.oob); # print(n.oob)
-    if (LeBlanc) tree <- grow.MST(dat=dat, test=data, method=method, min.ndsz=min.ndsz, n0=n0,
+    if (LeBlanc) tree <- grow.MST(dat=dat, test=data, method=method, min.ndsz=min.ndsz, min.nevents=min.nevents,
                                   col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=col.ctg,
                                   max.depth=max.depth, mtry=mtry, details=details, cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
-    else  tree <- grow.MST(dat=dat, test=dat.oob, method=method, min.ndsz=min.ndsz, n0=n0,
+    else  tree <- grow.MST(dat=dat, test=dat.oob, method=method, min.ndsz=min.ndsz, min.nevents=min.nevents,
                            col.time=col.time, col.status=col.status, col.id=col.id, col.split.var=col.split.var, col.ctg=col.ctg,
                            max.depth=max.depth, mtry=mtry, details=details, cont.split=cont.split,delta=delta,nCutPoints=nCutPoints)
     if (details) print(tree)
@@ -60,4 +61,4 @@ bootstrap.grow.prune <- function(data,   								# data frame containing the tra
   # THE INITIAL LARGE TREE
   out$initial.tree <- tree0
   out
-}   
+}

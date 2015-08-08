@@ -3,7 +3,14 @@ export(bootstrap.size)
 export(grow.MST)
 export(MST)
 export(MST.plot)
+export(MST.plot.latex)
 export(prune.size.testsample)
 export(rmultime)
 
 import(survival,MASS)
+
+importFrom("grDevices", "dev.off", "pdf", "postscript")
+importFrom("graphics", "legend", "lines", "par", "plot", "text")
+importFrom("stats", "aggregate", "coef", "complete.cases", "na.omit",
+           "optim", "pnorm", "quantile", "rexp", "rgamma", "rnorm",
+           "runif", "rweibull")

@@ -1,7 +1,8 @@
-partition.MST <- function(dat, test=NULL, name="1",
-                          method=c("marginal", "gamma.frailty", "exp.frailty"),       	# method= Choose between marginal, gamma.frailty, & exp.frailty
+partition.MST <-
+function(dat, test=NULL, name="1",
+                          method=c("marginal", "gamma.frailty", "exp.frailty"),     		# method= Choose between marginal, gamma.frailty, & exp.frailty
                           min.ndsz=20, 								# min.ndsz controls the minimum node size 
-                          n0=5, 									# n0=5 controls the minimum number of uncensored event times at either child node
+                          min.nevents=5, 									# min.nevents controls the minimum number of uncensored event times at either child node
                           col.time, col.status, col.id,					# columns for time, status, and id, respectively
                           col.split.var, 							# columns of splitting variables
                           col.ctg=NULL, 							# columns of categorical variables; this should be a subset of col.split.var
@@ -29,7 +30,7 @@ partition.MST <- function(dat, test=NULL, name="1",
   if (details) print(paste("Tree ", name, ": the sample size: ", n, " and num of events: ", n.event))
   if (details) print(depth)
   if (sum(!is.element(col.ctg, col.split.var)) >0) warning("col.ctg should be a subset of col.split.var.")	
-  if (depth <= max.depth && n >= min.ndsz && n.event > n0) {
+  if (depth <= max.depth && n >= min.ndsz && n.event > min.nevents) {
     if(method=="exp.frailty"){
       # FIT THE NULL MODEL
       X.i <- aggregate(x=time, by=list(id), FUN=sum)$x
@@ -57,11 +58,11 @@ partition.MST <- function(dat, test=NULL, name="1",
           score <- NA
           if (is.element(i,col.ctg)) {grp <- sign(is.element(z, j)); cut1 <- paste(j, collapse=" ")}      ##########################
           else  {grp <- sign(z <= j); cut1 <- as.character(j)}
-          if (method=="marginal") score <- splitting.stat.MST1(time, status, id, z=grp, n0)
-          else if (method=="gamma.frailty") score <- splitting.stat.MST2(time, status, id, z=grp, n0, method="wald.test")
+          if (method=="marginal") score <- splitting.stat.MST1(time, status, id, z=grp, min.nevents)
+          else if (method=="gamma.frailty") score <- splitting.stat.MST2(time, status, id, z=grp, min.nevents, method="wald.test")
           else if (method=="exp.frailty"){
             n.R1 <- sum(grp==0&status==1); n.L1 <- sum(grp==1&status==1);
-            if (min(n.R1, n.L1)>= n0){
+            if (min(n.R1, n.L1)>= min.nevents){
               # COMPUTE THE SCORE TEST STATISTIC
               mi <- aggregate(x=time*grp, by=list(id), FUN=sum)$x
               zdi <- aggregate(x=status*grp, by=list(id), FUN=sum)$x
@@ -88,11 +89,11 @@ partition.MST <- function(dat, test=NULL, name="1",
       # COMPUTE THE SCORE STAT BASED ON THE TEST SAMPLE
       if (is.element(var,col.ctg)) grp.test <- sign(is.element(test[,var], best.cut))                       ############################
       else  grp.test <- sign(test[,var] <= best.cut) 
-      if (method=="marginal") {score.test <- splitting.stat.MST1(time.test, status.test, id.test, z=grp.test, n0)
-      } else if (method=="gamma.frailty") {score.test <- splitting.stat.MST2(time.test, status.test, id.test, z=grp.test, n0, method="wald.test")
+      if (method=="marginal") {score.test <- splitting.stat.MST1(time.test, status.test, id.test, z=grp.test, min.nevents)
+      } else if (method=="gamma.frailty") {score.test <- splitting.stat.MST2(time.test, status.test, id.test, z=grp.test, min.nevents, method="wald.test")
       } else if (method=="exp.frailty") {
         nL1.test <- sum(grp.test==1&status.test==1); nR1.test <- sum(grp.test==0&status.test==1);
-        if (min(nL1.test, nR1.test) >= n0) {
+        if (min(nL1.test, nR1.test) >= min.nevents) {
           # fit the null model with the test sample
           X.i <- aggregate(x=time.test, by=list(id.test), FUN=sum)$x
           Delta.i <- aggregate(x=status.test, by=list(id.test), FUN=sum)$x
