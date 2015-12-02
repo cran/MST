@@ -1,14 +1,18 @@
 Package: MST
-Type: Package
+Version: 1.2
+Date: 2015-12-01
 Title: Multivariate Survival Trees
-Version: 1.1
-Date: 2015-08-08
-Author: Xiaogang Su, Peter Calhoun, and Juanjuan Fan
+Authors@R: c(person("Xiaogang", "Su", role="aut"),
+              person("Peter", "Calhoun", email="calhoun.peter@gmail.com", role=c("aut", "cre")),
+              person("Juanjuan", "Fan", role="aut"))
+Author: Xiaogang Su [aut],
+  Peter Calhoun [aut, cre],
+  Juanjuan Fan [aut]
 Maintainer: Peter Calhoun <calhoun.peter@gmail.com>
 Description: Constructs trees for multivariate survival data using marginal and frailty models.
 License: GPL-2
-Imports: survival, MASS, grDevices, graphics, stats
+Imports: graphics, grDevices, MASS, stats, survival
 NeedsCompilation: no
-Packaged: 2015-08-08 20:05:00 UTC; pcalh_000
+Packaged: 2015-12-01 18:35:12 UTC; pcalh_000
 Repository: CRAN
-Date/Publication: 2015-08-09 00:01:09
+Date/Publication: 2015-12-02 00:12:58

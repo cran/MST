@@ -1,5 +1,5 @@
 power.set <-
-function(x) {
+function(x){
   if(length(x) == 0) return(vector(mode(x), 0))
   x <- sort(unique(x)); n <- length(x); K <- NULL
   for(m in x) K <- rbind(cbind(K, FALSE), cbind(K, TRUE))

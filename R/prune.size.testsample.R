@@ -4,7 +4,7 @@ function(tree){
   ntest <- as.numeric(tree[1, ncol(tree)])
   if(is.null(dim(tree))) stop("No Need to Prune Further.")
   result <- NULL; n.tmnl <- sum(is.na(tree$var)); subtree <- 1
-  a <- cbind(Ga.2=2, Ga.3=3, Ga.4=4, Ga.BIC=log(ntest))
+  a <- cbind(Ga.2=2, Ga.3=3, Ga.4=4, Ga.log_n=log(ntest))
   max.Ga <- rep(-1e20, 4); size <- rep(0, 4); btree <-as.list(1:4) 
   while (n.tmnl > 1 ) {
     # print(tree)
@@ -17,7 +17,6 @@ function(tree){
     }
     alpha <- min(r.value)
     nod.rm <- internal[r.value == alpha];
-    # if (length(nod.rm)>1) print("Multiple Nodes will be pruned. Check!")
     G <- sum(as.numeric(as.vector(tree$score.test)), na.rm=TRUE); 
     Ga <- G - a*l
     for (k in 1:4){if (Ga[k] > max.Ga[k]) {max.Ga[k] <- Ga[k]; size[k] <- n.tmnl; btree[[k]] <- tree}}
@@ -34,8 +33,8 @@ function(tree){
     subtree <- subtree + 1
   }
   # HANDLE THE NULL TREE WITH THE ROOT NODE ONLY
-  result <- rbind(result, cbind(subtree=subtree, node.rm='NA', size.tree=nrow(tree), 
-                                size.tmnl=1, alpha=9999, G=0, Ga=cbind(Ga.2=0, Ga.3=0, Ga.4=0, Ga.BIC=0)))     
+  result <- rbind(result, cbind(subtree=subtree, node.rm='NA', size.tree=nrow(tree),
+                                size.tmnl=1, alpha=9999, G=0, Ga=cbind(Ga.2=0, Ga.3=0, Ga.4=0, Ga.log_n=0)))
   result <- as.data.frame(result)
   out$result <- result; out$size <- size; out$btree <- btree
   out 

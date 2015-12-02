@@ -1,4 +1,5 @@
-sortTree<-function(tree,data,col.time,col.status,col.id,col.ctg,col.ctg.ordinal){
+sortTree <-
+function(tree,data,col.time,col.status,col.id,col.ctg,col.ctg.ordinal){
   leq<-rep(NA,NROW(tree))
   nodesTemp<-tree$node
   #Initialize for root node
@@ -16,15 +17,16 @@ sortTree<-function(tree,data,col.time,col.status,col.id,col.ctg,col.ctg.ordinal)
         varTemp<-tree$var[substr(tree$node[j],1,nchar(tree$node[j])-i)==tree$node]
         cutTemp<-tree$cut[substr(tree$node[j],1,nchar(tree$node[j])-i)==tree$node]
         if(lastNode==1){
-          if(any(varTemp %in% col.ctg)){
+          if(any(varTemp %in% col.ctg) & !any(varTemp %in% col.ctg.ordinal)){
             parentNode[!(data[,varTemp] %in% as.character(cutTemp))]=FALSE
           } else {parentNode[data[,varTemp] > as.numeric(as.character(cutTemp))]=FALSE}
         } else {
-          if(any(varTemp %in% col.ctg)){
+          if(any(varTemp %in% col.ctg) & !any(varTemp %in% col.ctg.ordinal)){
             parentNode[data[,varTemp] %in% as.character(cutTemp)]=FALSE
           } else {parentNode[data[,varTemp] <= as.numeric(as.character(cutTemp))]=FALSE}
         }
       }
+      #print(c(tree$size[j],sum(parentNode)))
       leq[j]<-suppressWarnings(coef(coxph(Surv(data[,col.time][parentNode],data[,col.status][parentNode])~split[parentNode]+cluster(data[,col.id][parentNode])))<0)
     }
     lastTempNode<-nodesTemp[substr(tree$node[j],1,nchar(tree$node[j])-1)==tree$node]

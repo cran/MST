@@ -1,21 +1,13 @@
 rmultime <-
-function(beta=c(-1, 2, 1, 0, 0),      						# beta vector values with a beta0 (dim=p+1) 
-                     cutoff=c(.5, .5, 0, 0),								# cutoff values for each x (dim <= p)
-                     digits=1,										# rounding digits, suggested to be 1 or 2
-                     icensor=1, 										# control for censoring rate: 1 - 50%;
-                     model = c("gamma.frailty", "log.normal.frailty", 				# Models A-E in Fan, Nunn, and Su (2009)
-                               "marginal.multivariate.exponential",
-                               "marginal.nonabsolutely.continuous", "nonPH.weibull"),
-                     v=1, 											# v for the frailty model - the scale(or 1/rate) parameter in gamma or the variance parameter in normal  
-                     rho=.65, 										# the correlation used in marginal model with multivariate exponential (Model C)
-                     a=1.5, lambda=0.1, 								# two parameters used in the non-PH model (Model E)
-                     N=100, K=4)										# N- number of units; K - number of correlated failures for each unit
-{
-  if(all(model==c("gamma.frailty", "log.normal.frailty","marginal.multivariate.exponential",
-                  "marginal.nonabsolutely.continuous", "nonPH.weibull"))){model="gamma.frailty"
-  } else if (!(model %in% c("gamma.frailty", "log.normal.frailty","marginal.multivariate.exponential",
-                            "marginal.nonabsolutely.continuous", "nonPH.weibull"))){stop("Wrong specification of model= argument")}
-  
+function(N=100, K=4, beta=c(-1, 2, 1, 0, 0), cutoff=c(.5, .5, 0, 0),
+                     digits=1, icensor=1,
+                     model = c("gamma.frailty", "log.normal.frailty",
+                               "marginal.multivariate.exponential", "marginal.nonabsolutely.continuous",
+                               "nonPH.weibull"),
+                     v=1, rho=.65, a=1.5, lambda=0.1){
+  model<-match.arg(model,c("gamma.frailty", "log.normal.frailty","marginal.multivariate.exponential",
+                           "marginal.nonabsolutely.continuous", "nonPH.weibull"))
+
   #### Generate Covariates
   p <- length(beta)-1 
   X <- matrix(0, nrow=N*K, ncol=p)

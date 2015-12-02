@@ -1,10 +1,8 @@
 MST.plot <-
 function(tree, textDepth=4, digits=3, nsmall=0L, varText=c("vname","var"), lines=c("rectangle", "triangle"),...){
-  if(all(varText==c("vname", "var"))){varText="vname"
-  } else if (!(varText %in% c("vname", "var"))){stop("Wrong specification of varText= argument")}
-  if(all(lines==c("rectangle", "triangle"))){lines="rectangle"
-  } else if (!(lines %in% c("rectangle", "triangle"))){stop("Wrong specification of lines= argument")}
-  
+  varText<-match.arg(varText,c("vname", "var"))
+  lines<-match.arg(lines,c("rectangle", "triangle"))
+
   depth<-max(nchar(tree[,1]))
   par(xaxs='i')
   par(mar=c(1,1,1,1))

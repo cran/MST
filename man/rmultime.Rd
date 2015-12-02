@@ -3,12 +3,14 @@
 \title{Random Multivariate Survival Data}
 \description{Generates multivariate survival data}
 \usage{
-rmultime(beta = c(-1, 2, 1, 0, 0), cutoff = c(0.5, 0.5, 0, 0), digits = 1, icensor = 1,
-model = c("gamma.frailty", "log.normal.frailty", "marginal.multivariate.exponential",
-"marginal.nonabsolutely.continuous", "nonPH.weibull"), v = 1, rho = 0.65, a = 1.5,
-lambda = 0.1, N = 100, K = 4)
+rmultime(N=100, K=4, beta = c(-1, 2, 1, 0, 0), cutoff = c(0.5, 0.5, 0, 0),
+digits = 1, icensor = 1, model = c("gamma.frailty", "log.normal.frailty",
+"marginal.multivariate.exponential", "marginal.nonabsolutely.continuous",
+"nonPH.weibull"), v = 1, rho = 0.65, a = 1.5, lambda = 0.1)
 }
 \arguments{
+  \item{N}{Number of clusters (ids)}
+  \item{K}{Number of units per cluster}
   \item{beta}{Vector of beta coefficients (first number is baseline hazard coefficient (\eqn{\beta_{0}}), remaining numbers are slope coefficients for covariates (\eqn{\beta_{1}}))}
   \item{cutoff}{Cutoff values for each covariate}
   \item{digits}{Rounding digits}
@@ -19,8 +21,6 @@ lambda = 0.1, N = 100, K = 4)
   \item{rho}{Correlation for marginal models.  Not used in other models}
   \item{a}{Parameter for \code{"nonPH.weibull"} model.  Not used in other models}
   \item{lambda}{Parameter for \code{"nonPH.weibull"} model.  Not used in other models}
-  \item{N}{Number of clusters (ids)}
-  \item{K}{Number of units per cluster}
 }
 \details{
 This function generates multivariate survival data.  Letting \eqn{i=1,...,N} number of clusters and \eqn{j=1,...,K} number of units per cluster, the following multivariate survival models can be used:
@@ -65,13 +65,11 @@ Fan J., Nunn M., Su X. (2009) Multivariate exponential survival trees and their 
 \author{Xiaogang Su, Peter Calhoun, Juanjuan Fan}
 \seealso{\pkg{genSurv}, \pkg{complex.surv.dat.sim}, \pkg{survsim}}
 \examples{
-randMarginalExp<-rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model = "marginal.multivariate.exponential",
-  rho=.65, N=200, K=4)$dat
+randMarginalExp<-rmultime(N=200, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
+  digits=1, icensor=1, model = "marginal.multivariate.exponential", rho=.65)$dat
 
-randFrailtyGamma<-rmultime(beta=c(-1, 1, 3), cutoff=c(.4, .6, 0, 0),
-  digits=1, icensor=1, model = "gamma.frailty",
-  v=1, N=200, K=4)$dat
+randFrailtyGamma<-rmultime(N=200, K=4, beta=c(-1, 1, 3), cutoff=c(.4, .6, 0, 0),
+  digits=1, icensor=1, model = "gamma.frailty", v=1)$dat
 }
 \keyword{Simulation}
 \keyword{Survival}

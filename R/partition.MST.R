@@ -1,25 +1,12 @@
 partition.MST <-
-function(dat, test=NULL, name="1",
-                          method=c("marginal", "gamma.frailty", "exp.frailty"),     		# method= Choose between marginal, gamma.frailty, & exp.frailty
-                          min.ndsz=20, 								# min.ndsz controls the minimum node size 
-                          min.nevents=5, 									# min.nevents controls the minimum number of uncensored event times at either child node
-                          col.time, col.status, col.id,					# columns for time, status, and id, respectively
-                          col.split.var, 							# columns of splitting variables
-                          col.ctg=NULL, 							# columns of categorical variables; this should be a subset of col.split.var
-                          max.depth=10, 							# maximum depth of tree
-                          mtry=length(col.split.var),					# the number of variables considered at each split
-                          details=FALSE,                   # whether or not to print detailed information
-                          cont.split=c("distinct","percentiles"),								# whether candidate splits are every distinct value or percentiles
-                          delta=0.05,                # when using percentiles split, only split from delta to 1-delta
-                          nCutPoints=50)             # when using percentiles split, specify the number cutpoints (percentiles) considered
-{
-  if(all(method==c("marginal", "gamma.frailty", "exp.frailty"))){method="marginal"
-  } else if (!(method %in% c("marginal", "gamma.frailty", "exp.frailty"))){stop("Wrong specification of method= argument")}
-  if(all(cont.split==c("distinct","percentiles"))){cont.split="distinct"
-  } else if (!(cont.split %in% c("distinct","percentiles"))){stop("Wrong specification of cont.split= argument")}
-  
+function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.frailty"),     		# method= Choose between marginal, gamma.frailty, & exp.frailty
+                          col.time, col.status, col.id, col.split.var, col.ctg=NULL,
+                          minsplit=20, min.nevents=5, max.depth=10, mtry=length(col.split.var),
+                          cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,details=FALSE){
+  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty"))
+  cont.split<-match.arg(cont.split,c("distinct", "percentiles"))
+
   suppressWarnings(warning("coxph")); suppressWarnings(warning("coxpenal.fit"))
-  # NOTE THAT CTG INDICATES THE COLUMNS FOR CATEGORICAL VARIABLES. 
   call <- match.call(); out <- match.call(expand.dots = FALSE)
   out$info <- out$name.l <- out$name.r <- out$left <- out$right <- out$... <- NULL
   n <- nrow(dat);  vnames <- colnames(dat); var <- NA; cut <- NA;
@@ -30,7 +17,7 @@ function(dat, test=NULL, name="1",
   if (details) print(paste("Tree ", name, ": the sample size: ", n, " and num of events: ", n.event))
   if (details) print(depth)
   if (sum(!is.element(col.ctg, col.split.var)) >0) warning("col.ctg should be a subset of col.split.var.")	
-  if (depth <= max.depth && n >= min.ndsz && n.event > min.nevents) {
+  if (depth <= max.depth && n >= minsplit && n.event > min.nevents) {
     if(method=="exp.frailty"){
       # FIT THE NULL MODEL
       X.i <- aggregate(x=time, by=list(id), FUN=sum)$x
@@ -56,11 +43,11 @@ function(dat, test=NULL, name="1",
         }
         for (j in zcut) {
           score <- NA
-          if (is.element(i,col.ctg)) {grp <- sign(is.element(z, j)); cut1 <- paste(j, collapse=" ")}      ##########################
-          else  {grp <- sign(z <= j); cut1 <- as.character(j)}
-          if (method=="marginal") score <- splitting.stat.MST1(time, status, id, z=grp, min.nevents)
-          else if (method=="gamma.frailty") score <- splitting.stat.MST2(time, status, id, z=grp, min.nevents, method="wald.test")
-          else if (method=="exp.frailty"){
+          if (is.element(i,col.ctg)) {grp <- sign(is.element(z, j)); cut1 <- paste(j, collapse=" ")      ##########################
+          } else  {grp <- sign(z <= j); cut1 <- as.character(j)}
+          if (method=="marginal"){ score <- splitting.stat.MST1(time, status, id, z=grp, min.nevents)
+          } else if (method=="gamma.frailty"){ score <- splitting.stat.MST2(time, status, id, z=grp, min.nevents, method="wald.test")
+          } else if (method=="exp.frailty"){
             n.R1 <- sum(grp==0&status==1); n.L1 <- sum(grp==1&status==1);
             if (min(n.R1, n.L1)>= min.nevents){
               # COMPUTE THE SCORE TEST STATISTIC
@@ -87,8 +74,8 @@ function(dat, test=NULL, name="1",
     if (!(is.na(var)) && max.score!=0) {
       time.test <- test[, col.time]; status.test <- test[, col.status]; id.test <- test[, col.id]	
       # COMPUTE THE SCORE STAT BASED ON THE TEST SAMPLE
-      if (is.element(var,col.ctg)) grp.test <- sign(is.element(test[,var], best.cut))                       ############################
-      else  grp.test <- sign(test[,var] <= best.cut) 
+      if (is.element(var,col.ctg)){ grp.test <- sign(is.element(test[,var], best.cut))                       ############################
+      } else {grp.test <- sign(test[,var] <= best.cut)}
       if (method=="marginal") {score.test <- splitting.stat.MST1(time.test, status.test, id.test, z=grp.test, min.nevents)
       } else if (method=="gamma.frailty") {score.test <- splitting.stat.MST2(time.test, status.test, id.test, z=grp.test, min.nevents, method="wald.test")
       } else if (method=="exp.frailty") {

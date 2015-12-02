@@ -6,6 +6,7 @@ export(MST.plot)
 export(MST.plot.latex)
 export(prune.size.testsample)
 export(rmultime)
+export(send.down)
 
 import(survival,MASS)
 

@@ -6,7 +6,8 @@ function(tree, bsize=6){
   else if (bsize <1) stop("THE BEST TREE SIZE bsize= MUST BE >=1!")
   else {
     n.tmnl <- sum(is.na(tree$cut)); indicator <- TRUE
-    if (bsize > n.tmnl) stop("THE BEST TREE SIZE bsize PROVIDED IS LARGER THAN THE FULL TREE THAT YOU HAVE GROWN.")
+    if (bsize > n.tmnl){stop("THE BEST TREE SIZE bsize PROVIDED IS LARGER THAN THE FULL TREE THAT YOU HAVE GROWN.")
+    } else if (bsize == n.tmnl){btre <- tree;  indicator <- FALSE}
     while (n.tmnl >= bsize && indicator ==TRUE) {
       # print(tree); print(cbind(n.tmnl, bsize))
       internal <- tree$node[!is.na(tree$cut)]; l <- length(internal); 

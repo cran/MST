@@ -20,21 +20,20 @@ lines = c("rectangle", "triangle"), ...)}
 \examples{
 set.seed(409871)
 #Training dataset:
-training <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model = "marginal.multivariate.exponential",
-  rho=.65, N=200, K=4)$dat
+training <- rmultime(N=200, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
+  digits=1, icensor=1, model = "marginal.multivariate.exponential", rho=.65)$dat
 
 #Test dataset:
-test <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model = "marginal.multivariate.exponential", 
-  rho=.65, N=100, K=4)$dat
+test <- rmultime(N=100, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
+  digits=1, icensor=1, model = "marginal.multivariate.exponential", rho=.65)$dat
 
 #Construct Multivariate Survival Tree:
-fit <- MST(training=training,  test=test, method="marginal",	min.ndsz=30, min.nevents=5,
-  col.time=3, col.status=4, col.id=1, col.split.var=5:8, selection.method = "test.sample")
+fit <- MST(training=training,	test=test, method="marginal",
+  col.time=3, col.status=4, col.id=1, col.split.var=5:8,
+  minsplit=30, min.nevents=5, selection.method = "test.sample")
 
 MST.plot(fit$tree0, textDepth=5)          #Plot of initial tree
-MST.plot(fit$best.tree.structure[[4]])    #Plot of best-sized tree
+MST.plot(fit$best.tree.structure$Ga.4)    #Plot of best-sized tree with alpha=4
 }
 \keyword{Plot}
 \keyword{Trees}

@@ -10,8 +10,8 @@ function(bootstrap.grow.prune.results, plot.Ga=TRUE, filename=NULL, horizontal=T
   prune0 <- boot.prune[[1]] 
   n.subtree <- nrow(prune0)
   alpha <- as.numeric(as.vector(prune0$alpha))
-  # temp <- c(alpha[1], alpha[-length(alpha)])    	##############
-  temp <- c(0, alpha[-length(alpha)])  			############## CHANGE FIRST VALUE OF ALPHA TO 0
+  # temp <- c(alpha[1], alpha[-length(alpha)])
+  temp <- c(0, alpha[-length(alpha)])     #Set first value of alpha to 0
   alpha.prime <- sqrt(alpha*temp)
   # cbind(alpha,  alpha.prime=prune0$alpha.prime)
   b <- length(boot.prune)
@@ -42,26 +42,26 @@ function(bootstrap.grow.prune.results, plot.Ga=TRUE, filename=NULL, horizontal=T
     G.a[i,] <- G.honest - penalty*(size.tmnl[i]-1)
   }
   out <- data.frame(cbind(size.tmnl, G.a))
-  colnames(out) <- c("tmnl.size", "G", "G.2", "G.3", "G.4", "G.log(n)")
+  colnames(out) <- c("tmnl.size", "Ga", "Ga.2", "Ga.3", "Ga.4", "Ga.log_n")
   G.a <- out
   
   n.subtrees <- nrow(G.a)
   subtree.size <- G.a[,1]   
-  # PLOT THE G.a WITH DIFFERENT CHOICES OF a 	
+  # Plot Goodness of fit vs. a
   if (plot.Ga) {
     if (!is.null(filename)) postscript(file=filename, horizontal=horizontal)
-    par(mfrow=c(1, 1), mar=rep(4, 4))   ##################### SET THE PLOTTING PARAMETERS
+    par(mfrow=c(1, 1), mar=rep(4, 4))
     
-    min.x <- min(subtree.size); max.x <- max(subtree.size)
-    min.y <- min(G.a$"G.log(n)"); max.y <- max(G.a$G.2)
-    plot(x=c(min.x, max.x), y=c(min.y, max.y), type="n", xlab="tree size", ylab="G(a)")
-    for (j in 3:6) lines(subtree.size, G.a[,j], lty=j-1, col=j-1, lwd=2)
-    legend(x=min.x, y=(max.y+min.y)/2, lty=2:5, col=2:5, legend=c("G(2)", "G(3)", "G(4)", "G(ln(n))")) 
+    x.min <- min(subtree.size); x.max <- max(subtree.size)
+    y.min <- min(G.a$Ga.log_n); y.max <- max(G.a$Ga.2)
+    plot(x=c(x.min, x.max), y=c(y.min, y.max), type="n", xlab="# of Terminal Nodes", ylab="G.a Values")
+    for (j in 3:6) lines(subtree.size, G.a[,j], lty=1, col=j+4, lwd=2)
+    legend(x.min+4, (y.min+y.max)/2, col=7:10, lty=1, lwd=2, legend=c("Ga.2", "Ga.3", "Ga.4", "Ga.ln(n)"))
     if (!is.null(filename)) dev.off()
   }
-  # OBTAIN THE BEST TREE SIZE 
+  #Obtain the best size tree
   bsize <- btree <- as.list(NULL)
-  Ga.cols <- c("G.2", "G.3", "G.4", "G.log(n)")
+  Ga.cols <- c("Ga.2", "Ga.3", "Ga.4", "Ga.log_n")
   for (j in Ga.cols) {
     best.size <- subtree.size[which.max(G.a[,j])]
     bsize[[j]] <- best.size

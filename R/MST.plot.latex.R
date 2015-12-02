@@ -1,4 +1,5 @@
-MST.plot.latex <- function(tree, file="tree-code.tex", digits=5){
+MST.plot.latex <-
+function(tree, file="tree-code.tex", digits=5){
   n.node <- nrow(tree)
   sink(file=file)
   # DEFINE SYMBOLS

@@ -1,11 +1,5 @@
-ordinalizeFunc <- function(dat, 		# A data frame
-                           col.time, 				# The column number in data for storing the 'time' variable
-                           col.status, 			# The column number in data for storing the 'status' variable
-                           col.id, 				# The column number in data for storing the 'id' variable
-                           col.ctg, 				# The column numbers in data for storing the categorical variables that need to be ordinalized.
-                           details=TRUE,				# If true, will print out some details. 	
-                           min.levels=3)					# The minimum number for suggesting level-collasping before 'ordinalization'.
-{
+ordinalizeFunc <-
+function(dat, col.time, col.status, col.id, col.ctg, min.levels=3, details=FALSE){
   vnames <- colnames(dat)
   time <- dat[, col.time]; status <- dat[,col.status];  id <- dat[, col.id]; 
   n <- NROW(dat)	

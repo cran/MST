@@ -6,28 +6,30 @@ Constructs trees for multivariate survival data using marginal and frailty model
 }
 \usage{
 MST(training, test = NULL, method = c("marginal", "gamma.frailty", "exp.frailty"),
-min.ndsz = 20, min.nevents = 3, col.time, col.status, col.id, col.split.var,
-col.ctg = NULL, col.ctg.ordinal = col.ctg, max.depth = 10,
-mtry = length(col.split.var), selection.method = c("test.sample", "bootstrap"),
+col.time, col.status, col.id, col.split.var, col.ctg = NULL,
+col.ctg.ordinal = col.ctg, minsplit = 20, min.nevents = 3, max.depth = 10,
+mtry = length(col.split.var), cont.split = c("distinct", "percentiles"),
+delta = 0.05, nCutPoints = 50, selection.method = c("test.sample", "bootstrap"),
 B = 30, LeBlanc = TRUE, min.boot.tree.size = 1, plot.Ga = TRUE, filename = NULL,
-horizontal = TRUE, details = FALSE, cont.split = c("distinct", "percentiles"),
-delta = 0.05, nCutPoints = 50, sortTrees = TRUE)
+horizontal = TRUE, details = FALSE, sortTrees = TRUE)
 }
-
 \arguments{
   \item{training}{Data or training sample}
   \item{test}{Test sample if available}
   \item{method}{Indicates method of handling correlation: must be either \code{"marginal"}, \code{"gamma.frailty"}, or \code{"exp.frailty"}}
-  \item{min.ndsz}{Number: Controls the minimum node size}
-  \item{min.nevents}{Number: Controls the minimum number of uncensored event times at either child node}
   \item{col.time}{Column number for time}
   \item{col.status}{Column number for status}
   \item{col.id}{Column number for id}
   \item{col.split.var}{Column numbers of all variables wanting to split}
   \item{col.ctg}{Column numbers of categorical variables wanting to split; should be a subset of \code{col.split.var}}
   \item{col.ctg.ordinal}{Column numbers of categorical variables that should be ordinalized and group levels; should be a subset of \code{col.ctg}}
+  \item{minsplit}{Number: Controls the minimum node size}
+  \item{min.nevents}{Number: Controls the minimum number of uncensored event times at either child node}
   \item{max.depth}{Number: Maximum depth of tree}
   \item{mtry}{Number of variables considered at each split}
+  \item{cont.split}{Indicates candidate splits: must be \code{"distinct"} or \code{"percentiles"}}
+  \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when \code{cont.split="percentiles"}}
+  \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when \code{cont.split="percentiles"}}
   \item{selection.method}{Indicates method of selecting the best-sized subtree: \code{"test.sample"} or \code{"bootstrap"}}
   \item{B}{Number of bootstrap samples.  Only used if \code{selection.method="bootstrap"}}
   \item{LeBlanc}{Logical: Indicates if entire sample used (alternative is out-of-bag sample).  Only used if \code{selection.method="bootstrap"}}
@@ -36,9 +38,6 @@ delta = 0.05, nCutPoints = 50, sortTrees = TRUE)
   \item{filename}{Name of the file plotted}
   \item{horizontal}{Logical: Indicates if plot should be landscape}
   \item{details}{Logical: Indicates if detailed information should be printed}
-  \item{cont.split}{Indicates candidate splits: must be \code{"distinct"} or \code{"percentiles"}}
-  \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when \code{cont.split="percentiles"}}
-  \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when \code{cont.split="percentiles"}}
   \item{sortTrees}{Logical: Indicates if trees should be sorted such that each split to the left has lower risk of failure}
 }
 \details{
@@ -98,7 +97,7 @@ Xiaogang Su, Peter Calhoun, and Juanjuan Fan
 \note{
 Code may take awhile to implement large datasets.  To decrease computation time, user should use test sample (\code{selection.method="test.sample"}). User can also split continuous variables based on percentiles (\code{cont.split="percentiles"}) at the expense of slightly less accuracy.  Gamma frailty models are more computationally intensive
 }
-\section{Warning}{Error messages in the gamma frailty models sometimes occur when using the bootstrap method.  Increasing \code{min.ndsz} may help fix these errors}
+\section{Warning}{Error messages in the gamma frailty models sometimes occur when using the bootstrap method.  Increasing \code{minsplit} may help fix these errors}
 
 \seealso{
 \code{\link{MST.plot}}, \pkg{rpart}
@@ -107,18 +106,17 @@ Code may take awhile to implement large datasets.  To decrease computation time,
 \examples{
 set.seed(409871)
 #Training dataset:
-training <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model = "marginal.multivariate.exponential",
-  rho=.65, N=200, K=4)$dat
+training <- rmultime(N=200, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
+  digits=1, icensor=1, model="marginal.multivariate.exponential", rho=.65)$dat
 
 #Test dataset:
-test <- rmultime(beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model = "marginal.multivariate.exponential", 
-  rho=.65, N=100, K=4)$dat
+test <- rmultime(N=100, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
+  digits=1, icensor=1, model="marginal.multivariate.exponential", rho=.65)$dat
 
 #Construct Multivariate Survival Tree:
-fit <- MST(training=training,	test=test, method="marginal",	min.ndsz=30, min.nevents=5,
-  col.time=3, col.status=4, col.id=1, col.split.var=5:8, selection.method = "test.sample")
+fit <- MST(training=training,	test=test, method="marginal",
+  col.time=3, col.status=4, col.id=1, col.split.var=5:8,
+  minsplit=30, min.nevents=5, selection.method="test.sample")
 }
 \keyword{Trees}
 \keyword{Survival}
