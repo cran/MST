@@ -1,10 +1,10 @@
 bootstrap.grow.prune <-
-function(data, method=c("marginal", "gamma.frailty", "exp.frailty"),
+function(data, method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"),
                                  col.time, col.status, col.id, col.split.var, col.ctg=NULL,
                                  minsplit=20, min.nevents=3, max.depth=10, mtry=length(col.split.var),
                                  cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,
                                  B=30, LeBlanc=TRUE, min.boot.tree.size=1, details=FALSE){
-  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty"))
+  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"))
   cont.split<-match.arg(cont.split,c("distinct", "percentiles"))
 
   call <- match.call(); out <- match.call(expand.dots = FALSE)

@@ -1,16 +1,29 @@
 \name{MST-package}
 \alias{MST-package}
-\alias{as.numeric.factor}
-\alias{de}
-\alias{gr0}
 \alias{is.odd}
-\alias{loglik0}
-\alias{obtain.btree}
-\alias{partition.MST}
+\alias{as.numeric.factor}
+\alias{ordinalizeFunc}
 \alias{power.set}
-\alias{prune.size}
 \alias{splitting.stat.MST1}
 \alias{splitting.stat.MST2}
+\alias{splitting.stat.MST3}
+\alias{splitting.stat.MST4}
+\alias{loglik0}
+\alias{gr0}
+\alias{partition.MST}
+\alias{grow.MST}
+\alias{de}
+\alias{prune.size.testsample}
+\alias{prune.size}
+\alias{bootstrap.grow.prune}
+\alias{bootstrap.size}
+\alias{obtain.btree}
+\alias{send.down}
+\alias{sortTree}
+\alias{MST.plot}
+\alias{MST.plot.latex}
+\alias{listIntoParty}
+\alias{listIntoTree}
 \docType{package}
 \title{Multivariate Survival Trees Package}
 \description{
@@ -20,8 +33,8 @@ This package constructs trees for multivariate survival data using marginal and 
 \tabular{ll}{
 Package: \tab MST\cr
 Type: \tab Package\cr
-Version: \tab 1.2\cr
-Date: \tab 2015-12-01\cr
+Version: \tab 1.3\cr
+Date: \tab 2016-05-24\cr
 License: \tab GPL-2 \cr
 }
 Regression trees require few statistical assumptions, handle a variety of data structures, and provide meaningful interpretations.  There are several functions to construct regression trees (see \pkg{rpart}, \pkg{tree}, and \pkg{party}); this package extends the implementation to multivariate survival data. There are two main approaches to analyzing correlated failure times.  One is the marginal approach studied by authors Wei et al. (1989) and Liang et al. (1993).  In the marginal model, the correlation is modeled implicitly using generalized estimating equations on the marginal distribution formulated by the Cox (1972) proportional hazards model.  The other approach is the frailty model studied by Clayton (1978) and Clayton and Cuzick (1985).  In the frailty model, the correlation is modeled explicitly by a multiplicative random effect called frailty, which corresponds to some common unobserved characteristics shared by all correlated times.

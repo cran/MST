@@ -1,9 +1,9 @@
 partition.MST <-
-function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.frailty"),     		# method= Choose between marginal, gamma.frailty, & exp.frailty
+function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"),
                           col.time, col.status, col.id, col.split.var, col.ctg=NULL,
                           minsplit=20, min.nevents=5, max.depth=10, mtry=length(col.split.var),
-                          cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,details=FALSE){
-  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty"))
+                          cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50, details=FALSE){
+  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"))
   cont.split<-match.arg(cont.split,c("distinct", "percentiles"))
 
   suppressWarnings(warning("coxph")); suppressWarnings(warning("coxpenal.fit"))
@@ -17,36 +17,42 @@ function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.fr
   if (details) print(paste("Tree ", name, ": the sample size: ", n, " and num of events: ", n.event))
   if (details) print(depth)
   if (sum(!is.element(col.ctg, col.split.var)) >0) warning("col.ctg should be a subset of col.split.var.")	
-  if (depth <= max.depth && n >= minsplit && n.event > min.nevents) {
+  if (depth <= max.depth && n >= minsplit && n.event >= 2*min.nevents) {
     if(method=="exp.frailty"){
       # FIT THE NULL MODEL
       X.i <- aggregate(x=time, by=list(id), FUN=sum)$x
       Delta.i <- aggregate(x=status, by=list(id), FUN=sum)$x
       dat1 <- data.frame(X.i=X.i, Delta.i=Delta.i)
-      x <- optim(par=c(1, 1), fn=loglik0, gr=gr0, method = "SANN", control = list(maxit=200), hessian=FALSE, dat=dat1)    	############## GLOBAL OPTIMIZATION (SIMULATED ANNEALING)
+    	# print(dat1)
+      x <- optim(par=c(1, 1), fn=loglik0, gr=gr0, method = "SANN", control = list(maxit=800), hessian=FALSE, dat=dat1)    	############## GLOBAL OPTIMIZATION (SIMULATED ANNEALING)
+    	# print(x$par); print(x$value) 
       x <- optim(par=x$par, fn=loglik0, gr=gr0, method = "BFGS", hessian = TRUE, control = list(maxit=50), dat=dat1)  		############## 
-      # x <- optim(par=x$par, fn=loglik0, method = "BFGS", hessian = TRUE, dat=dat1)  							############## NUMERIC DERIVATIVES
+      # x <- optim(par=x$par, fn=loglik0, method = "Nelder-Mead", hessian = TRUE, control = list(maxit=50), dat=dat1)  							############## NUMERIC DERIVATIVES
       if (!is.null(x$message)) print(paste("At the ", i, "-th run, there are ", x$message, " in fitting the null model.")) 
       beta0 <- x$par[1]; v0 <- x$par[2]; I0.inv <- solve(x$hessian)
       Ai <- 1/v0 + Delta.i; Bi <- 1/v0 + exp(beta0)*X.i
     }
     
     # SEARCH FOR BEST SPLIT OF THE TRAINING DAT
-    for(i in sort(sample(col.split.var, size=mtry, replace=FALSE))) {
+    #If one col.split.var, sample function does not work correctly.  Specifically handle 1 split variable
+    if(length(col.split.var)==1){col.split.varTemp<-rep(col.split.var,2)
+    } else {col.split.varTemp<-col.split.var}
+    
+    for(i in sort(sample(col.split.varTemp, size=mtry, replace=FALSE))){
       z <- dat[,i]; v.name <- vnames[i]; temp <- sort(unique(na.omit(z)));
-      if(length(temp) > 1) {
-        if (is.element(i,col.ctg)){ zcut <- power.set(temp)    				############################ CLASS VARIABLE
+      if(length(temp) > 1){
+        if (is.element(i,col.ctg)){ zcut <- power.set(temp)    				##### CLASS VARIABLE
         } else {
           if(cont.split=="distinct" | length(temp) <= 50){zcut <- temp[-length(temp)]
           } else if(cont.split=="percentiles" & (delta>0.2 | delta<0.01 | nCutPoints < 5)){stop("Choice of percentile cutpoints too small")
           } else if(cont.split=="percentiles"){zcut <- quantile(temp, probs = seq(delta,1-delta,length=nCutPoints))} ## TAKE PERCENTILEs OF CUTOFF POINT
         }
-        for (j in zcut) {
+        for (j in zcut){
           score <- NA
-          if (is.element(i,col.ctg)) {grp <- sign(is.element(z, j)); cut1 <- paste(j, collapse=" ")      ##########################
+          if (is.element(i,col.ctg)) {grp <- sign(is.element(z, j)); cut1 <- paste(j, collapse=" ")
           } else  {grp <- sign(z <= j); cut1 <- as.character(j)}
           if (method=="marginal"){ score <- splitting.stat.MST1(time, status, id, z=grp, min.nevents)
-          } else if (method=="gamma.frailty"){ score <- splitting.stat.MST2(time, status, id, z=grp, min.nevents, method="wald.test")
+          } else if (method=="gamma.frailty"){ score <- splitting.stat.MST2(time, status, id, z=grp, min.nevents, splitstat="wald.test")
           } else if (method=="exp.frailty"){
             n.R1 <- sum(grp==0&status==1); n.L1 <- sum(grp==1&status==1);
             if (min(n.R1, n.L1)>= min.nevents){
@@ -59,7 +65,10 @@ function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.fr
               score <- U^2/(I11 - t(I1theta)%*%I0.inv%*%I1theta)
               score <- max(0, score)
             }
-          }
+          } else if (method=="stratified"){ score <- splitting.stat.MST3(time, status, id, z=grp, min.nevents)
+          } else if (method=="independence"){ score <- splitting.stat.MST4(time, status, id, z=grp, min.nevents)
+          } else {stop("Unexpected method")}
+          
           if (identical(score, numeric(0))) score <- NA		# TO DEAL WITH THE PROBLEM THAT THE WALD TEST COULD RETURN numeric(0). 
           if (!is.na(score) && score >= max.score) {max.score <- score; var <- i; vname <- v.name; cut <- cut1; best.cut<-j; grp.best <- grp}
           if (details) {print(cbind(var=i, v.name=v.name, cut=j, score=score, max.score=max.score));} # print(is.null(score)); print(score)}
@@ -74,10 +83,10 @@ function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.fr
     if (!(is.na(var)) && max.score!=0) {
       time.test <- test[, col.time]; status.test <- test[, col.status]; id.test <- test[, col.id]	
       # COMPUTE THE SCORE STAT BASED ON THE TEST SAMPLE
-      if (is.element(var,col.ctg)){ grp.test <- sign(is.element(test[,var], best.cut))                       ############################
+      if (is.element(var,col.ctg)){ grp.test <- sign(is.element(test[,var], best.cut))
       } else {grp.test <- sign(test[,var] <= best.cut)}
       if (method=="marginal") {score.test <- splitting.stat.MST1(time.test, status.test, id.test, z=grp.test, min.nevents)
-      } else if (method=="gamma.frailty") {score.test <- splitting.stat.MST2(time.test, status.test, id.test, z=grp.test, min.nevents, method="wald.test")
+      } else if (method=="gamma.frailty") {score.test <- splitting.stat.MST2(time.test, status.test, id.test, z=grp.test, min.nevents, splitstat="wald.test")
       } else if (method=="exp.frailty") {
         nL1.test <- sum(grp.test==1&status.test==1); nR1.test <- sum(grp.test==0&status.test==1);
         if (min(nL1.test, nR1.test) >= min.nevents) {
@@ -98,7 +107,9 @@ function(dat, test=NULL, name="1", method=c("marginal", "gamma.frailty", "exp.fr
           score.test <- U^2/(I11 - t(I1theta)%*%I0.inv%*%I1theta)
           score.test <- ifelse(score.test<0, NA, score.test)
         }
-      }
+      } else if (method=="stratified") {score.test <- splitting.stat.MST3(time.test, status.test, id.test, z=grp.test, min.nevents)
+      } else if (method=="independence") {score.test <- splitting.stat.MST4(time.test, status.test, id.test, z=grp.test, min.nevents)
+      } else {stop("Unexpected method")}
     }
   } else {n.test <- n; score.test <- max.score}
   

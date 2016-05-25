@@ -1,24 +1,47 @@
 MST <-
-function(training, test=NULL, method=c("marginal", "gamma.frailty", "exp.frailty"),
-                col.time, col.status, col.id, col.split.var, col.ctg=NULL, col.ctg.ordinal=col.ctg,
-                minsplit=20, min.nevents=3, max.depth=10, mtry=length(col.split.var),
+function(formula, training, test=NULL, method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"), 
+                minsplit=20, min.nevents=3, max.depth=10, mtry=NULL,
                 cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,
                 selection.method=c("test.sample", "bootstrap"),
                 B = 30, LeBlanc=TRUE, min.boot.tree.size=1,
-                plot.Ga=TRUE, filename=NULL, horizontal=TRUE, details=FALSE,sortTrees=TRUE){
-  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty"))
-  cont.split<-match.arg(cont.split,c("distinct","percentiles"))
-  selection.method<-match.arg(selection.method,c("test.sample", "bootstrap"))
-  if (is.null(test) & selection.method=="test.sample"){
-    print("No test sample supplied, changed selection.method='bootstrap'")
-    selection.method<-"bootstrap"
-  }
+                plot.Ga=TRUE, filename=NULL, horizontal=TRUE, details=FALSE,sortTrees=TRUE)
+{
+  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"))
+	cont.split<-match.arg(cont.split,c("distinct","percentiles"))
+	selection.method<-match.arg(selection.method,c("test.sample", "bootstrap"))
+	if (is.null(test) & selection.method=="test.sample"){
+  		print("No test sample supplied, changed selection.method='bootstrap'")
+  		selection.method<-"bootstrap"
+	}
+	#Convert character variables into factors
+	training[,names(training)] <- lapply(training[,names(training)] , function(x){if(is.character(x)){factor(x)} else {x}})
+	if(!is.null(test)){test[,names(test)] <- lapply(test[,names(test)] , function(x){if(is.character(x)){factor(x)} else {x}})}
+	
+	# OBTAIN THE COLUMNS 
+	form0 <- formula; vnames <- colnames(training)
+	Vs <- all.vars(form0); n.V <- length(Vs)
+	col.time <- which(vnames == (Vs[1]))
+	col.status <- which(vnames == Vs[2])
+	col.id <- which(vnames == Vs[n.V])
+	col.split.var <- which(is.element(vnames, Vs[3: (n.V-1)]))
+	if(is.null(mtry)){mtry<-length(col.split.var)}
+	# EXTRACT THE COLS FOR CATEGORICAL VARIABLES
+	xs <- gsub(" ", "", unlist(strsplit(unlist(strsplit(as.character(form0)[3], split="[|]"))[1], split="[+]")),fixed = TRUE)
+	cat.var <- sapply(xs,function(x){is.factor(training[[x]])})
+	#cat.var <- grep("factor", xs)
+	col.ctg <- col.split.var[cat.var]
+	if (length(col.ctg)==0) col.ctg=NULL
+	col.ctg.ordinal <- col.ctg  ############ I THINK WE MIGHT NOT NEED THIS ONE. 
+
   if(any(is.na(training[,c(col.time,col.status,col.id,col.split.var)])) | 
     (ifelse(!is.null(test),any(is.na(test[,c(col.time,col.status,col.id,col.split.var)])),FALSE))){
     print("Note: Data with missing values deleted")
     training<-training[complete.cases(training[,c(col.time,col.status,col.id,col.split.var)]),]
     test<-test[complete.cases(test[,c(col.time,col.status,col.id,col.split.var)]),]
   }
+	
+	#Will convert factors to numeric.  Save training dataset beforehand
+	trainingTemp<-training
   
   if(!is.null(col.ctg.ordinal)){
     temp<-ordinalizeFunc(training,col.time=col.time,col.status=col.status,col.id=col.id,
@@ -105,27 +128,35 @@ function(training, test=NULL, method=c("marginal", "gamma.frailty", "exp.frailty
     for(i in 1:NROW(tree0)){
       if(tree0$var[i] %in% col.ctg.ordinal){
         info<-get(as.character(tree0$vname[i]), temp$info)
-        if(tree0$operator[i] == "in"){treeCut[i]<-paste(info[as.numeric(info[,3]) <= as.numeric(as.character(tree0$cut[i])),1],collapse=",")
-        } else if (tree0$operator[i] == "not in"){treeCut[i]<-paste(info[as.numeric(info[,3]) > as.numeric(as.character(tree0$cut[i])),1],collapse=",")
+        if(tree0$operator[i] == "<="){treeCut[i]<-paste(info[as.numeric(info[,3]) <= as.numeric(as.character(tree0$cut[i])),1],collapse=",")
+        } else if (tree0$operator[i] == ">"){treeCut[i]<-paste(info[as.numeric(info[,3]) > as.numeric(as.character(tree0$cut[i])),1],collapse=",")
         } else {stop("Unexpected operator")}
       }
     }
     tree0$cut<-treeCut
+    tree0$operator[tree0$var %in% col.ctg]="in"
+    
     for(name in names(best.tree.structure)){
       tree<-best.tree.structure[[name]]
       treeCut<-as.character(tree$cut)
       for(i in 1:NROW(tree)){
         if(tree$var[i] %in% col.ctg.ordinal){
           info<-get(as.character(tree$vname[i]), temp$info)
-          if(tree$operator[i] == "in"){treeCut[i]<- paste(info[as.numeric(info[,3]) <= as.numeric(as.character(tree$cut[i])),1],collapse=",")
-          } else if (tree$operator[i] == "not in"){treeCut[i]<- paste(info[as.numeric(info[,3]) <= as.numeric(as.character(tree$cut[i])),1],collapse=",")
+          if(tree$operator[i] == "<="){treeCut[i]<- paste(info[as.numeric(info[,3]) <= as.numeric(as.character(tree$cut[i])),1],collapse=",")
+          } else if (tree$operator[i] == ">"){treeCut[i]<- paste(info[as.numeric(info[,3]) > as.numeric(as.character(tree$cut[i])),1],collapse=",")
           } else {stop("Unexpected operator")}
         }
       }
       best.tree.structure[[name]]$cut<-treeCut
+      best.tree.structure[[name]]$operator[best.tree.structure[[name]]$var %in% col.ctg]="in"
     }
   }
-  
+
+	tree0<-listIntoTree(tree=tree0, data=trainingTemp, formula=formula)
+	for(name in names(best.tree.structure)){
+  	best.tree.structure[[name]]<-listIntoTree(tree=best.tree.structure[[name]], data=trainingTemp, formula=formula)
+	}
+	
   return(list(tree0=tree0, pruning.info=pruning.info, 
               best.tree.size=best.tree.size, best.tree.structure=best.tree.structure))
 }

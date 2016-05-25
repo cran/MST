@@ -1,17 +1,11 @@
-export(bootstrap.grow.prune)
-export(bootstrap.size)
-export(grow.MST)
 export(MST)
-export(MST.plot)
-export(MST.plot.latex)
-export(prune.size.testsample)
 export(rmultime)
-export(send.down)
 
-import(survival,MASS)
+import(MASS, partykit, survival)
 
 importFrom("grDevices", "dev.off", "pdf", "postscript")
 importFrom("graphics", "legend", "lines", "par", "plot", "text")
+importFrom("methods", "is")
 importFrom("stats", "aggregate", "coef", "complete.cases", "na.omit",
            "optim", "pnorm", "quantile", "rexp", "rgamma", "rnorm",
-           "runif", "rweibull")
+           "runif", "rweibull", "terms")

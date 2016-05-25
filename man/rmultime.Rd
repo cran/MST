@@ -4,9 +4,9 @@
 \description{Generates multivariate survival data}
 \usage{
 rmultime(N=100, K=4, beta = c(-1, 2, 1, 0, 0), cutoff = c(0.5, 0.5, 0, 0),
-digits = 1, icensor = 1, model = c("gamma.frailty", "log.normal.frailty",
-"marginal.multivariate.exponential", "marginal.nonabsolutely.continuous",
-"nonPH.weibull"), v = 1, rho = 0.65, a = 1.5, lambda = 0.1)
+          digits = 1, icensor = 1, model = c("gamma.frailty", "log.normal.frailty",
+          "marginal.multivariate.exponential", "marginal.nonabsolutely.continuous",
+        "nonPH.weibull"), v = 1, rho = 0.65, a = 1.5, lambda = 0.1)
 }
 \arguments{
   \item{N}{Number of clusters (ids)}

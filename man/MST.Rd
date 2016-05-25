@@ -2,31 +2,26 @@
 \alias{MST}
 \title{Multivariate Survival Trees}
 \description{
-Constructs trees for multivariate survival data using marginal and frailty models.  Combines \code{\link{grow.MST}}, \code{\link{prune.size.testsample}}, \code{\link{bootstrap.grow.prune}}, and \code{\link{bootstrap.size}} into one final wrapper function.
+Constructs trees for multivariate survival data using marginal and frailty models.  A wrapper function that grows a large initial tree, prunes the tree, and selects the best sized tree.
 }
 \usage{
-MST(training, test = NULL, method = c("marginal", "gamma.frailty", "exp.frailty"),
-col.time, col.status, col.id, col.split.var, col.ctg = NULL,
-col.ctg.ordinal = col.ctg, minsplit = 20, min.nevents = 3, max.depth = 10,
-mtry = length(col.split.var), cont.split = c("distinct", "percentiles"),
-delta = 0.05, nCutPoints = 50, selection.method = c("test.sample", "bootstrap"),
-B = 30, LeBlanc = TRUE, min.boot.tree.size = 1, plot.Ga = TRUE, filename = NULL,
-horizontal = TRUE, details = FALSE, sortTrees = TRUE)
+MST(formula, training, test=NULL,
+     method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"), 
+    minsplit=20, min.nevents=3, max.depth=10, mtry=NULL,
+    cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,
+    selection.method=c("test.sample", "bootstrap"),
+    B = 30, LeBlanc=TRUE, min.boot.tree.size=1,
+     plot.Ga=TRUE, filename=NULL, horizontal=TRUE, details=FALSE, sortTrees=TRUE)
 }
 \arguments{
+  \item{formula}{A linear survival model with the response on the left of a ~ operator and the predictors, separated by + operators, on the right.  Cluster (or id) variable is distinguished by a vertical bar \code{|} (e.g. \code{Surv(time,status) ~ x1 + x2 | id}).  Categorical predictors must be treated as a factor.}
   \item{training}{Data or training sample}
   \item{test}{Test sample if available}
-  \item{method}{Indicates method of handling correlation: must be either \code{"marginal"}, \code{"gamma.frailty"}, or \code{"exp.frailty"}}
-  \item{col.time}{Column number for time}
-  \item{col.status}{Column number for status}
-  \item{col.id}{Column number for id}
-  \item{col.split.var}{Column numbers of all variables wanting to split}
-  \item{col.ctg}{Column numbers of categorical variables wanting to split; should be a subset of \code{col.split.var}}
-  \item{col.ctg.ordinal}{Column numbers of categorical variables that should be ordinalized and group levels; should be a subset of \code{col.ctg}}
+  \item{method}{Indicates method of handling correlation: must be either \code{"marginal"}, \code{"gamma.frailty"}, \code{"exp.frailty"}, \code{"stratified"}, or \code{"independence"}}
   \item{minsplit}{Number: Controls the minimum node size}
   \item{min.nevents}{Number: Controls the minimum number of uncensored event times at either child node}
   \item{max.depth}{Number: Maximum depth of tree}
-  \item{mtry}{Number of variables considered at each split}
+  \item{mtry}{Number of variables considered at each split.  The default is to consider all variables}
   \item{cont.split}{Indicates candidate splits: must be \code{"distinct"} or \code{"percentiles"}}
   \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when \code{cont.split="percentiles"}}
   \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when \code{cont.split="percentiles"}}
@@ -37,7 +32,7 @@ horizontal = TRUE, details = FALSE, sortTrees = TRUE)
   \item{plot.Ga}{Logical: Indicates if goodness-of-fit vs. tree size should be plotted}
   \item{filename}{Name of the file plotted}
   \item{horizontal}{Logical: Indicates if plot should be landscape}
-  \item{details}{Logical: Indicates if detailed information should be printed}
+  \item{details}{Logical: Indicates if detailed information on the construction should be printed}
   \item{sortTrees}{Logical: Indicates if trees should be sorted such that each split to the left has lower risk of failure}
 }
 \details{
@@ -67,19 +62,21 @@ For the marginal model, a robust logrank statistic is calculated for each covari
 
 For the frailty models, a score test statistic is calculated from the maximum integrated log likelihood for each covariate \eqn{Z} and possible cutpoint \eqn{c}.  The frailty term must follow some known positive distribution; one common choice is \eqn{w_{i} \sim \Gamma(1/\nu, 1/\nu)} where \eqn{\nu} represents an unknown variance.  Note, the exponential frailty model replaces the baseline hazard function with a constant, yielding different score test statistics and typically computationally faster splits.  The best split is the one with the largest score test statistic.
 
+Stratified model grows a tree by minimizing the within-strata variation.  This method should be used with care because the tree will not split on variables with a fixed value within each stratum.  The independence model ignores the dependence and uses the logrank statistic as the splitting rule.
+
 For continuous variables with many distinct cutpoints, the number of cutpoints considered can be reduced to percentiles.  Using percentiles increases efficiency at the expense of less accuracy.
 
 Growing the initial tree is done by splitting nodes (as described above) reiteratively until the maximum depth of the tree is reached or a small number of observations remain at terminal node.  However, as the final tree model can be any subtree of the initial tree, the number of subtrees can become massive.  A goodness-of-fit with an added penalty for the number of internal nodes is used to prune the trees (i.e. reduce the number of subtrees considered).  The best-sized tree is selected by the largest goodness-of-fit with the added penalty using either the test sample or bootstrap samples.
 }
 
 \value{
-  \item{tree0}{The initial tree}
+  \item{tree0}{The initial tree.  Tree listed as constparty object}
   \item{prunining.info}{Trees pruned and considered in the best tree selection}
   \item{best.tree.size}{The best tree size based on the penalty used}
-  \item{best.tree.structure}{The best tree structure based on the penalty used}
+  \item{best.tree.structure}{The best tree structure based on the penalty used.  Tree listed as constparty object}
 \eqn{\vspace{-1mm}}
 
-Note, G represents the goodness-of-fit statistic with the respective penalties.  Nodes are represented using binary numbers.  True operations move to the left of the tree.  See \code{\link{MST.plot}}
+Note, the constparty object requires a constant fit from each terminal node.  Thus, the \code{predict} and \code{plot} functions ignore the dependence, so users are recommended to fit their own model when making predictions (see example)
 }
 
 \references{
@@ -114,9 +111,14 @@ test <- rmultime(N=100, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
   digits=1, icensor=1, model="marginal.multivariate.exponential", rho=.65)$dat
 
 #Construct Multivariate Survival Tree:
-fit <- MST(training=training,	test=test, method="marginal",
-  col.time=3, col.status=4, col.id=1, col.split.var=5:8,
-  minsplit=30, min.nevents=5, selection.method="test.sample")
+fit <- MST(Surv(time, status)~ x1 + x2 + x3 + x4 | id, training=training,	test=test,
+  method="marginal", minsplit=30, min.nevents=5, selection.method="test.sample")
+plot(fit$best.tree.structure$Ga.4)
+
+#Create model using tree structure
+library(survival)
+termNodes<-predict(fit$best.tree.structure$Ga.4, newdata=training, type='node') #Terminal nodes
+mod<-coxph(Surv(time, status) ~ factor(termNodes) + cluster(id), data=training)
 }
 \keyword{Trees}
 \keyword{Survival}

@@ -1,9 +1,9 @@
 grow.MST <-
-function(dat, test=NULL, method=c("marginal", "gamma.frailty", "exp.frailty"),
+function(dat, test=NULL, method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"),
                      col.time, col.status, col.id, col.split.var, col.ctg=NULL,
                      minsplit=20, min.nevents=3, max.depth=10, mtry=length(col.split.var),
                      cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50, details=FALSE){
-  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty"))
+  method<-match.arg(method,c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"))
   cont.split<-match.arg(cont.split,c("distinct", "percentiles"))
 
   out <- list.nd <- list.test <- temp.list <- temp.test <- temp.name <- NULL

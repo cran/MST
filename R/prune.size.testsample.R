@@ -1,7 +1,7 @@
 prune.size.testsample <-
 function(tree){
   out <- as.list(NULL)
-  ntest <- as.numeric(tree[1, ncol(tree)])
+  ntest <- as.numeric(tree$size.test[1])
   if(is.null(dim(tree))) stop("No Need to Prune Further.")
   result <- NULL; n.tmnl <- sum(is.na(tree$var)); subtree <- 1
   a <- cbind(Ga.2=2, Ga.3=3, Ga.4=4, Ga.log_n=log(ntest))

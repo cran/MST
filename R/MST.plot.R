@@ -1,5 +1,7 @@
 MST.plot <-
 function(tree, textDepth=4, digits=3, nsmall=0L, varText=c("vname","var"), lines=c("rectangle", "triangle"),...){
+  if(is.null(tree)){stop("Empty tree")}
+  if(nrow(tree)==1){stop("No splits")}
   varText<-match.arg(varText,c("vname", "var"))
   lines<-match.arg(lines,c("rectangle", "triangle"))
 

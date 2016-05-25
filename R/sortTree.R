@@ -1,5 +1,6 @@
 sortTree <-
 function(tree,data,col.time,col.status,col.id,col.ctg,col.ctg.ordinal){
+  if(nrow(tree)==1){return(cbind(tree,operator=NA)[,c(1,2,3,4,9,5,6,7,8)])}
   leq<-rep(NA,NROW(tree))
   nodesTemp<-tree$node
   #Initialize for root node
@@ -35,7 +36,7 @@ function(tree,data,col.time,col.status,col.id,col.ctg,col.ctg.ordinal){
     nodesTemp[j]<-paste0(lastTempNode,lastLEQ)
   }
   operator=ifelse(leq,"<=",">")
-  operator[tree$var %in% col.ctg]=ifelse(leq[tree$var %in% col.ctg],"in","not in")
+  #operator[tree$var %in% col.ctg]=ifelse(leq[tree$var %in% col.ctg],"in","not in")
   tree$operator<-operator
   tree$node<-nodesTemp
   tree<-tree[order(tree$node),c(1,2,3,4,9,5,6,7,8)]
