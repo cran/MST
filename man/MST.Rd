@@ -1,33 +1,42 @@
 \name{MST}
 \alias{MST}
+\alias{splitting.stat.MST1}
+\alias{splitting.stat.MST2}
+\alias{splitting.stat.MST3}
+\alias{splitting.stat.MST4}
 \title{Multivariate Survival Trees}
 \description{
 Constructs trees for multivariate survival data using marginal and frailty models.  A wrapper function that grows a large initial tree, prunes the tree, and selects the best sized tree.
 }
 \usage{
-MST(formula, training, test=NULL,
-     method=c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"), 
-    minsplit=20, min.nevents=3, max.depth=10, mtry=NULL,
-    cont.split=c("distinct","percentiles"), delta=0.05, nCutPoints=50,
-    selection.method=c("test.sample", "bootstrap"),
-    B = 30, LeBlanc=TRUE, min.boot.tree.size=1,
-     plot.Ga=TRUE, filename=NULL, horizontal=TRUE, details=FALSE, sortTrees=TRUE)
+MST(formula, data, test = NULL, weights_data, weights_test, subset,
+  method = c("marginal", "gamma.frailty", "exp.frailty", "stratified", "independence"),
+  minsplit = 20, minevents = 3, minbucket = round(minsplit/3), maxdepth = 10,
+  mtry = NULL, distinct = TRUE, delta = 0.05, nCutPoints = 50,
+  selection.method = c("test.sample", "bootstrap"),
+  B = 30, LeBlanc = TRUE, min.boot.tree.size = 1,
+  plot.Ga = TRUE, filename = NULL, horizontal = TRUE, details = FALSE, sortTrees = TRUE)
 }
 \arguments{
   \item{formula}{A linear survival model with the response on the left of a ~ operator and the predictors, separated by + operators, on the right.  Cluster (or id) variable is distinguished by a vertical bar \code{|} (e.g. \code{Surv(time,status) ~ x1 + x2 | id}).  Categorical predictors must be treated as a factor.}
-  \item{training}{Data or training sample}
+  \item{data}{Data to grow and prune the tree}
   \item{test}{Test sample if available}
-  \item{method}{Indicates method of handling correlation: must be either \code{"marginal"}, \code{"gamma.frailty"}, \code{"exp.frailty"}, \code{"stratified"}, or \code{"independence"}}
+  \item{weights_data}{An optional vector of weights to grow the tree}
+  \item{weights_test}{An optional vector of weights to select the best-sized tree}
+  \item{subset}{An optional vector specifying a subset of observations to be used to grow the tree}
+  \item{method}{Indicates method of handling correlation: must be either \code{"marginal"},
+\code{"gamma.frailty"}, \code{"exp.frailty"}, \code{"stratified"}, or \code{"independence"}}
   \item{minsplit}{Number: Controls the minimum node size}
-  \item{min.nevents}{Number: Controls the minimum number of uncensored event times at either child node}
-  \item{max.depth}{Number: Maximum depth of tree}
+  \item{minevents}{Number: Controls the minimum number of uncensored event times}
+  \item{minbucket}{Number: Controls the minimum number of observations in any terminal node}
+  \item{maxdepth}{Number: Maximum depth of tree}
   \item{mtry}{Number of variables considered at each split.  The default is to consider all variables}
-  \item{cont.split}{Indicates candidate splits: must be \code{"distinct"} or \code{"percentiles"}}
-  \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when \code{cont.split="percentiles"}}
-  \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when \code{cont.split="percentiles"}}
+  \item{distinct}{Logical: Indicates if all distinct cutpoints or only percentiles considered}
+  \item{delta}{Consider cutpoints from delta to 1 \eqn{-} delta.  Only used when \code{distinct = TRUE}}
+  \item{nCutPoints}{Number of cutpoints (percentiles) considered.  Only used when \code{distinct = TRUE}}
   \item{selection.method}{Indicates method of selecting the best-sized subtree: \code{"test.sample"} or \code{"bootstrap"}}
-  \item{B}{Number of bootstrap samples.  Only used if \code{selection.method="bootstrap"}}
-  \item{LeBlanc}{Logical: Indicates if entire sample used (alternative is out-of-bag sample).  Only used if \code{selection.method="bootstrap"}}
+  \item{B}{Number of bootstrap samples.  Only used if \code{selection.method = "bootstrap"}}
+  \item{LeBlanc}{Logical: Indicates if entire sample used (alternative is out-of-bag sample).  Only used if \code{selection.method = "bootstrap"}}
   \item{min.boot.tree.size}{Number: Minimum size of tree grown at each bootstrap}
   \item{plot.Ga}{Logical: Indicates if goodness-of-fit vs. tree size should be plotted}
   \item{filename}{Name of the file plotted}
@@ -36,31 +45,23 @@ MST(formula, training, test=NULL,
   \item{sortTrees}{Logical: Indicates if trees should be sorted such that each split to the left has lower risk of failure}
 }
 \details{
-Marginal and frailty models are the two main ways to analyze correlated failure times.  Let \eqn{Z_{ij}} represent the covariate vector for the \eqn{j}th member in the \eqn{i}th cluster.
-
-\eqn{\vspace{-1mm}}
+Marginal and frailty models are the two main ways to analyze correlated failure times.  Let \eqn{X_{ij}} represent the covariate vector for the \eqn{j}th member in the \eqn{i}th cluster.
 
 The marginal model uses the Cox (1972) proportional hazards model:
-\deqn{\lambda_{ij}(t|Z_{ij})=\lambda_{0}(t) \exp(\beta \cdot I(Z_{ij} \leq c))}
+\deqn{\lambda_{ij}(t|X_{ij})=\lambda_{0}(t) \exp(\beta \cdot I(X_{ij} \leq c))}
 where \eqn{\lambda_{0}(t)} is an unspecified baseline hazard function and \eqn{I(\cdot)} is the indicator function.
 
-\eqn{\vspace{-3mm}}
-
 The gamma frailty model uses the proportional hazards model:
-\deqn{\lambda_{ij}(t|Z_{ij}, w_{i})=\lambda_{0}(t) \exp(\beta \cdot I(Z_{ij} \leq c)) w_{i}}
+\deqn{\lambda_{ij}(t|X_{ij}, w_{i})=\lambda_{0}(t) \exp(\beta \cdot I(X_{ij} \leq c)) w_{i}}
 where \eqn{\lambda_{0}(t)} is an unspecified baseline hazard function, \eqn{I(\cdot)} is the indicator function, and \eqn{w_{i}} is the frailty term for the \eqn{i}th cluster.
 
-\eqn{\vspace{-3mm}}
-
 The exponential frailty model uses the proportional hazards model:
-\deqn{\lambda_{ij}(t|Z_{ij}, w_{i})=\exp(\beta_{0} + \beta_{1} \cdot I(Z_{ij} \leq c)) w_{i}}
+\deqn{\lambda_{ij}(t|X_{ij}, w_{i})=\exp(\beta_{0} + \beta_{1} \cdot I(X_{ij} \leq c)) w_{i}}
 where \eqn{I(\cdot)} is the indicator function and \eqn{w_{i}} is the frailty term for the \eqn{i}th cluster.
 
-\eqn{\vspace{-1mm}}
+For the marginal model, a robust logrank statistic is calculated for each covariate \eqn{X} and possible cutpoint \eqn{c}.  The estimate of the score function and likelihood of \eqn{\beta} can be obtained assuming independence.  However, the variance-covariance structure adjusts for the dependence using a sandwich-type estimator.  The best split is the one with the largest robust logrank statistic.
 
-For the marginal model, a robust logrank statistic is calculated for each covariate \eqn{Z} and possible cutpoint \eqn{c}.  The estimate of the score function and likelihood of \eqn{\beta} can be obtained assuming independence.  However, the variance-covariance structure adjusts for the dependence using a sandwich-type estimator.  The best split is the one with the largest robust logrank statistic.
-
-For the frailty models, a score test statistic is calculated from the maximum integrated log likelihood for each covariate \eqn{Z} and possible cutpoint \eqn{c}.  The frailty term must follow some known positive distribution; one common choice is \eqn{w_{i} \sim \Gamma(1/\nu, 1/\nu)} where \eqn{\nu} represents an unknown variance.  Note, the exponential frailty model replaces the baseline hazard function with a constant, yielding different score test statistics and typically computationally faster splits.  The best split is the one with the largest score test statistic.
+For the frailty models, a score test statistic is calculated from the maximum integrated log likelihood for each covariate \eqn{X} and possible cutpoint \eqn{c}.  The frailty term must follow some known positive distribution; one common choice is \eqn{w_{i} \sim \Gamma(1/\nu, 1/\nu)} where \eqn{\nu} represents an unknown variance.  Note, the exponential frailty model replaces the baseline hazard function with a constant, yielding different score test statistics and typically computationally faster splits.  The best split is the one with the largest score test statistic.
 
 Stratified model grows a tree by minimizing the within-strata variation.  This method should be used with care because the tree will not split on variables with a fixed value within each stratum.  The independence model ignores the dependence and uses the logrank statistic as the splitting rule.
 
@@ -74,7 +75,6 @@ Growing the initial tree is done by splitting nodes (as described above) reitera
   \item{prunining.info}{Trees pruned and considered in the best tree selection}
   \item{best.tree.size}{The best tree size based on the penalty used}
   \item{best.tree.structure}{The best tree structure based on the penalty used.  Tree listed as constparty object}
-\eqn{\vspace{-1mm}}
 
 Note, the constparty object requires a constant fit from each terminal node.  Thus, the \code{predict} and \code{plot} functions ignore the dependence, so users are recommended to fit their own model when making predictions (see example)
 }
@@ -92,33 +92,31 @@ Su X., Fan J. (2004) Multivariate Survival Trees: A Maximum Likelihood Approach 
 Xiaogang Su, Peter Calhoun, and Juanjuan Fan
 }
 \note{
-Code may take awhile to implement large datasets.  To decrease computation time, user should use test sample (\code{selection.method="test.sample"}). User can also split continuous variables based on percentiles (\code{cont.split="percentiles"}) at the expense of slightly less accuracy.  Gamma frailty models are more computationally intensive
+Code may take awhile to implement large datasets.  To decrease computation time, user should use test sample (\code{selection.method = "test.sample"}). User can also split continuous variables based on percentiles (\code{distinct = FALSE}) at the expense of slightly less accuracy.  Gamma frailty models are more computationally intensive
 }
-\section{Warning}{Error messages in the gamma frailty models sometimes occur when using the bootstrap method.  Increasing \code{minsplit} may help fix these errors}
+\section{Warning}{Error messages in the gamma frailty models sometimes occur when using the bootstrap method.  Increasing \code{minsplit} may help fix these errors.  The exponential frailty model can have problems for large, extremely unbalanced designs.  Currently weights can only be applied to marginal and gamma frailty models.}
 
 \seealso{
-\code{\link{MST.plot}}, \pkg{rpart}
+\pkg{rpart}
 }
 
 \examples{
-set.seed(409871)
-#Training dataset:
-training <- rmultime(N=200, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model="marginal.multivariate.exponential", rho=.65)$dat
-
-#Test dataset:
-test <- rmultime(N=100, K=4, beta=c(-1, 2, 2, 0, 0), cutoff=c(.5, .5, 0, 0),
-  digits=1, icensor=1, model="marginal.multivariate.exponential", rho=.65)$dat
+set.seed(186117)
+data <- rmultime(N = 200, K = 4, beta = c(-1, 0.8, 0.8, 0, 0), cutoff = c(0.5, 0.3, 0, 0),
+    model = "marginal.multivariate.exponential", rho = 0.65)$dat
+test <- rmultime(N = 100, K = 4, beta = c(-1, 0.8, 0.8, 0, 0), cutoff = c(0.5, 0.3, 0, 0),
+    model = "marginal.multivariate.exponential", rho = 0.65)$dat
 
 #Construct Multivariate Survival Tree:
-fit <- MST(Surv(time, status)~ x1 + x2 + x3 + x4 | id, training=training,	test=test,
-  method="marginal", minsplit=30, min.nevents=5, selection.method="test.sample")
-plot(fit$best.tree.structure$Ga.4)
+fit <- MST(formula = Surv(time, status) ~ x1 + x2 + x3 + x4 | id, data, test,
+    method = "marginal", minsplit = 100, minevents = 20, selection.method = "test.sample")
 
-#Create model using tree structure
-library(survival)
-termNodes<-predict(fit$best.tree.structure$Ga.4, newdata=training, type='node') #Terminal nodes
-mod<-coxph(Surv(time, status) ~ factor(termNodes) + cluster(id), data=training)
+(tree_final <- getTree(fit, 4))
+plot(tree_final)
+
+#Fit a model from the final tree
+data$term_nodes <- as.factor(predict(tree_final, newdata = data, type = 'node'))
+coxph(Surv(time, status) ~ term_nodes + cluster(id), data = data)
 }
 \keyword{Trees}
 \keyword{Survival}

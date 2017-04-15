@@ -1,12 +1,9 @@
 splitting.stat.MST1 <-
-function(time, status, id, z, min.nevents){  
-  n1 <- sum(z==1&status==1); n2 <- sum(z==0&status==1); 
+function(surv, id, z, weights) {
   score <- NA
-  if (all(!is.na(c(n1, n2))) && min(n1, n2)>=min.nevents){
-    options(warn=-1)
-    fit <- coxph(Surv(time, status) ~ z + cluster(id))
-    options(warn=0)
-    score <- fit$rscore
-  }
+  options(warn = -1)
+  fit <- try(coxph(surv ~ z + cluster(id), weights=weights), silent = TRUE)
+  options(warn = 0)
+  if (!inherits(fit, "try-error")) { score <- fit$rscore }
   score
 }

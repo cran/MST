@@ -1,11 +1,12 @@
+export(getTree)
 export(MST)
 export(rmultime)
 
-import(MASS, partykit, survival)
+import("MASS", "partykit", "survival", "Formula")
 
 importFrom("grDevices", "dev.off", "pdf", "postscript")
 importFrom("graphics", "legend", "lines", "par", "plot", "text")
 importFrom("methods", "is")
 importFrom("stats", "aggregate", "coef", "complete.cases", "na.omit",
            "optim", "pnorm", "quantile", "rexp", "rgamma", "rnorm",
-           "runif", "rweibull", "terms")
+           "runif", "rweibull", "terms", "model.weights")
