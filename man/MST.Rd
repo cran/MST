@@ -80,13 +80,15 @@ Note, the constparty object requires a constant fit from each terminal node.  Th
 }
 
 \references{
-Cox D.R. (1972) Regression models and life-tables (with discussion).  Journal of the Royal Statistical Society Series B, 34, 187-202
+Calhoun P., Su X., Nunn M., Fan J. (2018) Constructing Multivariate Survival Trees: The MST Package for R. \emph{Journal of Statistical Software}, \bold{83}(12), 1--21.
 
-Fan J., Su X., Levine R., Nunn M., LeBlanc M. (2006) Trees for Correlated Survival Data by Goodness of Split, With Applications to Tooth Prognosis. Journal of American Statistical Association, 101, 959-967
+Cox D.R. (1972) Regression models and life-tables (with discussion).  \emph{Journal of the Royal Statistical Society Series B}, \bold{34}(2), 187--220.
 
-Fan J., Nunn M., Su X. (2009) Multivariate exponential survival trees and their application to tooth prognosis.  Computational Statistics and Data Analysis, 53, 1110-1121
+Fan J., Su X., Levine R., Nunn M., LeBlanc M. (2006) Trees for Correlated Survival Data by Goodness of Split, With Applications to Tooth Prognosis. \emph{Journal of American Statistical Association}, \bold{101}(475), 959--967.
 
-Su X., Fan J. (2004) Multivariate Survival Trees: A Maximum Likelihood Approach Based on Frailty Models.  Biometrics, 60, 93-99
+Fan J., Nunn M., Su X. (2009) Multivariate exponential survival trees and their application to tooth prognosis.  \emph{Computational Statistics and Data Analysis}, \bold{53}(4), 1110--1121.
+
+Su X., Fan J. (2004) Multivariate Survival Trees: A Maximum Likelihood Approach Based on Frailty Models.  \emph{Biometrics}, \bold{60}(1), 93--99.
 }
 \author{
 Xiaogang Su, Peter Calhoun, and Juanjuan Fan

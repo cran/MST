@@ -1,4 +1,4 @@
-1ea17d366422644041fbb20f11698b5c *DESCRIPTION
+9cae9226e8c1d3154914539e6232bafe *DESCRIPTION
 4a65d7b3e9be086b617efe4022c59784 *NAMESPACE
 7e4e06f18930168df439f96f94141b45 *R/MST.R
 5e49f9ddbaf268e3d19b8c8d2112f018 *R/MST.plot.R
@@ -28,11 +28,12 @@ bb7ac563f05c9eab6f565bbdc636e6cb *R/splitting.stat.MST1.R
 95e2d81b4f98b874db97a84fcaad1ced *R/splitting.stat.MST2.R
 65aef5a5dfed40f28d3fa8b8d2b79a14 *R/splitting.stat.MST3.R
 597017392b3e1855286e85f2da81ea65 *R/splitting.stat.MST4.R
-e5c77b07d8da8c9bd75528c23338be45 *data/Teeth.rda
+bde130187b3bc0518dc07d5fe6732992 *data/Teeth.rda
 3a003790ca5f8ad157f2153ecd219185 *data/datalist
-6bc75df4428c2e2f0fdf9bf17b474cac *inst/NEWS.Rd
-ac7e7f9be3805f179fae812f3a102426 *man/MST-package.Rd
-5d5ff29f79684755ff3c380f104eb341 *man/MST.Rd
+c5d1417ccf57463c9b4dccd8d41df46d *inst/CITATION
+91a2da23fe34c7cf9bbe44cd29011b80 *inst/NEWS.Rd
+d44fa4fbeee999e86b317ac087f6120d *man/MST-package.Rd
+21d2118ca107cfc200deb931bbc2079e *man/MST.Rd
 b86bd7362ba5feb16bd762a22c160d3c *man/Teeth.Rd
 c0684dd1c8f81226cc08ed947af0e659 *man/getTree.Rd
-7952453667ee756ad20f569a80eeb352 *man/rmultime.Rd
+e4fb632b915c33e6a8622cc38f507b6d *man/rmultime.Rd

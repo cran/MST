@@ -1,7 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the MST package}
 
-\section{Changes in Version 2.0 (2017-04-10)}{
+\section{Changes in Version 2.1 (2018-02-16)}{
+  \itemize{
+    
+    \item{MST package published in Journal of Statistical Software.  Added citation.}
+
+  }
+}
+
+\section{Changes in Version 2.0 (2017-04-15)}{
   \itemize{
     
     \item{Changed input names (e.g., changed training to data and max.depth to maxdepth)}

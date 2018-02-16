@@ -1,0 +1,22 @@
+bibentry(bibtype = "Article",
+  title        = "Constructing Multivariate Survival Trees: The {MST} Package for {R}",
+  author       = c(person(given = "Peter",
+                          family = "Calhoun",
+                          email = "calhoun.peter@gmail.com"),
+                   person(given = "Xiaogang",
+                          family = "Su"),
+                   person(given = "Martha",
+                          family = "Nunn"),
+                   person(given = "Juanjuan",
+                          family = "Fan",
+                          email = "jjfan@mail.sdsu.edu")),
+  journal      = "Journal of Statistical Software",
+  year         = "2018",
+  volume       = "83",
+  number       = "12",
+  pages        = "1--21",
+  doi          = "10.18637/jss.v083.i12",
+
+  header       = "To cite MST in publications use:"
+)
+

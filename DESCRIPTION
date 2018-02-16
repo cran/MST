@@ -1,7 +1,7 @@
 Package: MST
 Type: Package
 Title: Multivariate Survival Trees
-Version: 2.0
+Version: 2.1
 Authors@R: c(person("Xiaogang", "Su", role="aut"),
               person("Peter", "Calhoun", email="calhoun.peter@gmail.com", role=c("aut", "cre")),
               person("Juanjuan", "Fan", role="aut"))
@@ -16,6 +16,6 @@ Depends: R (>= 3.1.0), survival
 Imports: graphics, grDevices, MASS, Formula, methods, partykit, stats
 LazyData: true
 NeedsCompilation: no
-Packaged: 2017-04-14 23:59:04 UTC; Owner
+Packaged: 2018-02-16 18:35:33 UTC; Owner
 Repository: CRAN
-Date/Publication: 2017-04-15 05:14:56 UTC
+Date/Publication: 2018-02-16 19:29:08 UTC

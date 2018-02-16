@@ -44,9 +44,9 @@ The user specifies the coefficients (\eqn{\beta_{0}} and \eqn{\beta_{1}}), the c
   \item{model}{The model used}
 }
 \references{
-Su X., Fan J., Wang A., Johnson M. (2006) On Simulating Multivariate Failure Times.  International Journal of Applied Mathematics & Statistics, 5, 8-18
+Fan J., Nunn M., Su X. (2009) Multivariate exponential survival trees and their application to tooth prognosis.  \emph{Computational Statistics and Data Analysis}, \bold{53}(4), 1110--1121.
 
-Fan J., Nunn M., Su X. (2009) Multivariate exponential survival trees and their application to tooth prognosis.  Computational Statistics and Data Analysis, 53, 1110-1121
+Su X., Fan J., Wang A., Johnson M. (2006) On Simulating Multivariate Failure Times.  \emph{International Journal of Applied Mathematics & Statistics}, \bold{5}, 8--18
 }
 \author{Xiaogang Su, Peter Calhoun, Juanjuan Fan}
 \seealso{\pkg{genSurv}, \pkg{complex.surv.dat.sim}, \pkg{survsim}}
