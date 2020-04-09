@@ -84,6 +84,6 @@ function(N = 100, K = 4, beta = c(-1, 2, 1, 0, 0), cutoff = c(0.5, 0.5, 0, 0),
   }
 
   colnames(X) <- paste("x", 1:p, sep = "")
-  dat <- data.frame(id=rep(1:N, rep(K, N)),rep=rep(1:K, N), time=xobs, status=dind, X)
+  dat <- data.frame(id=rep(1:N, rep(K, N)),rep=rep(1:K, N), time=xobs, status=dind, X, stringsAsFactors=FALSE)
   return(list(dat=dat, model=model))
 }

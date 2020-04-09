@@ -21,7 +21,7 @@ function(dat, test = NULL, weights_data, weights_test, name = "1",
       # FIT THE NULL MODEL
       X.i <- aggregate(x = surv[ , 1], by = list(id), FUN = sum)$x
       Delta.i <- aggregate(x = surv[ , 2], by = list(id), FUN = sum)$x
-      dat1 <- data.frame(X.i = X.i, Delta.i = Delta.i)
+      dat1 <- data.frame(X.i = X.i, Delta.i = Delta.i, stringsAsFactors=FALSE)
       # print(dat1)
       x <- optim(par = c(1, 1), fn = loglik0, gr = gr0, method = "SANN", control = list(maxit = 800), hessian = FALSE, dat = dat1)    	### GLOBAL OPTIMIZATION (SIMULATED ANNEALING)
       # print(x$par); print(x$value)
@@ -99,7 +99,7 @@ function(dat, test = NULL, weights_data, weights_test, name = "1",
       } else if (method == "exp.frailty") {
         X.i <- aggregate(x = surv.test[ , 1], by = list(id.test), FUN = sum)$x
         Delta.i <- aggregate(x = surv.test[ , 2], by = list(id.test), FUN = sum)$x
-        dat2 <- data.frame(X.i = X.i, Delta.i = Delta.i)
+        dat2 <- data.frame(X.i = X.i, Delta.i = Delta.i, stringsAsFactors=FALSE)
         x1 <- optim(c(2, 1.5), fn = loglik0, gr = gr0, method = "Nelder-Mead", hessian = TRUE, dat = dat2)
         beta0 <- x1$par[1]; v0 <- x1$par[2]
         I0.inv <- try(solve(x1$hessian), silent = TRUE)
@@ -131,6 +131,6 @@ function(dat, test = NULL, weights_data, weights_test, name = "1",
     
   } else { var <- NA; vname <- NA; cut <- NA;  max.score <- score.test <- NA }
   out$info <- data.frame(node = name, size = n, var = var, vname = vname, cut = cut,
-                         score = ifelse(max.score == -1e10, NA, max.score), size.test = n.test, score.test)
+                         score = ifelse(max.score == -1e10, NA, max.score), size.test = n.test, score.test, stringsAsFactors=FALSE)
   out
 }

@@ -29,8 +29,8 @@ This package constructs trees for multivariate survival data using marginal and 
 \tabular{ll}{
 Package: \tab MST\cr
 Type: \tab Package\cr
-Version: \tab 2.1\cr
-Date: \tab 2018-02-16\cr
+Version: \tab 2.2\cr
+Date: \tab 2020-04-05\cr
 License: \tab GPL-2 \cr
 }
 Decision trees require few statistical assumptions, handle a variety of data structures, and provide meaningful interpretations.  There are several R packages that provide functions to construct survival trees (see \pkg{rpart}, \pkg{partykit}, and \pkg{DStree}); this package extends the implementation to multivariate survival data. There are two main approaches to analyzing correlated failure times.  One is the marginal approach studied by authors Wei et al. (1989) and Liang et al. (1993).  In the marginal model, the correlation is modeled implicitly using generalized estimating equations on the marginal distribution formulated by the Cox (1972) proportional hazards model.  The other approach is the frailty model studied by Clayton (1978) and Clayton and Cuzick (1985).  In the frailty model, the correlation is modeled explicitly by a multiplicative random effect called frailty, which corresponds to some common unobserved characteristics shared by all correlated times.

@@ -4,6 +4,9 @@ function(surv, id, z, weights) {
   options(warn = -1)
   fit <- try(coxph(surv ~ z + cluster(id), weights=weights), silent = TRUE)
   options(warn = 0)
-  if (!inherits(fit, "try-error")) { score <- fit$rscore }
+  if (!inherits(fit, "try-error")) {
+    score <- fit$rscore
+    if (length(score) == 0) { score <- NA }
+  }
   score
 }

@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the MST package}
 
+\section{Changes in Version 2.2 (2020-04-05)}{
+  \itemize{
+    
+    \item{Updated to work for R version 4.0.  Fixed error message when there were few predictors}
+
+  }
+}
+
 \section{Changes in Version 2.1 (2018-02-16)}{
   \itemize{
     

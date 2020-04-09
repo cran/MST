@@ -40,7 +40,7 @@ function(bootstrap.grow.prune.results, plot.Ga = TRUE, filename = NULL, horizont
     G.honest <- G[i] - bias / (b - 1)
     G.a[i, ] <- G.honest - penalty * (size.tmnl[i] - 1)
   }
-  out <- data.frame(cbind(size.tmnl, G.a))
+  out <- data.frame(cbind(size.tmnl, G.a), stringsAsFactors=FALSE)
   colnames(out) <- c("tmnl.size", "Ga", "Ga.2", "Ga.3", "Ga.4", "Ga.log_n")
   G.a <- out
 

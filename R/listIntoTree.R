@@ -10,7 +10,7 @@ function(tree, data, formula, weights) {
                fitted = data.frame("(fitted)" = fitted,
                                    "(response)" = response,
                                    "(weights)" = weights,
-                                   check.names = FALSE),
+                                   check.names = FALSE, stringsAsFactors=FALSE),
                terms = terms(formula))
   return(as.constparty(ret))
 }

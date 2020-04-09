@@ -59,7 +59,6 @@ function(formula, data, test = NULL, weights_data, weights_test, subset,
   col.split.var <- 2:(ncol(mf_data)-1)
   if (is.null(mtry)) { mtry <- length(col.split.var) }
   # EXTRACT THE COLS FOR CATEGORICAL VARIABLES
-  x <- mf_data[col.split.var][,3]
   cat.var <- vapply(mf_data[col.split.var], is.factor, logical(1))
   col.ctg <- col.split.var[cat.var]
   if (length(col.ctg) == 0) col.ctg <- NULL
@@ -94,7 +93,7 @@ function(formula, data, test = NULL, weights_data, weights_test, subset,
     pruning.info <- tmp <- prn$result
 
     col.Ga <- 7:10
-    for (j in c(4, col.Ga)) tmp[,j] <- as.numeric.factor(tmp[ , j])
+    for (j in c(4, col.Ga)) tmp[,j] <- as.numeric(tmp[ , j])
 
     # PLOT THE G.a WITH DIFFERENT CHOICES OF a
     if (plot.Ga) {
